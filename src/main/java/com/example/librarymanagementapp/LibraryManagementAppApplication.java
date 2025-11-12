@@ -8,6 +8,6 @@ public class LibraryManagementAppApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(LibraryManagementAppApplication.class, args);
+        System.out.println("🚀 Library Management App is running...");
     }
-
 }
