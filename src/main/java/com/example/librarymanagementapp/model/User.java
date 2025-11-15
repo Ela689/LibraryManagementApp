@@ -11,47 +11,139 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // --- date de bază ---
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String phone;
 
-    private String role; // USER sau ADMIN
-    private boolean active; // validat de admin
-    private String idCardFile; // numele fișierului uploadat (pdf/img)
+    // --- rol & status ---
+    @Column(nullable = false)
+    private String role; // "ADMIN" sau "USER"
+
+    @Column(nullable = false)
+    private boolean active;
+
+    // --- fișier carte de identitate ---
+    private String idCardFileName;
+    private String idCardFilePath;
+
+    // --- data înregistrării ---
     private LocalDate registrationDate;
 
+    // === CONSTRUCTORI ===
     public User() {
-        this.registrationDate = LocalDate.now();
-        this.active = false;
-        this.role = "USER";
     }
 
-    // Getteri și setteri
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public User(String username, String password, String email, String phone, String role, boolean active) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.phone = phone;
+        this.role = role;
+        this.active = active;
+        this.registrationDate = LocalDate.now();
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    // === GETTERS & SETTERS ===
+    public Long getId() {
+        return id;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public String getPassword() {
+        return password;
+    }
 
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getIdCardFile() { return idCardFile; }
-    public void setIdCardFile(String idCardFile) { this.idCardFile = idCardFile; }
+    public String getEmail() {
+        return email;
+    }
 
-    public LocalDate getRegistrationDate() { return registrationDate; }
-    public void setRegistrationDate(LocalDate registrationDate) { this.registrationDate = registrationDate; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getIdCardFileName() {
+        return idCardFileName;
+    }
+
+    public void setIdCardFileName(String idCardFileName) {
+        this.idCardFileName = idCardFileName;
+    }
+
+    public String getIdCardFilePath() {
+        return idCardFilePath;
+    }
+
+    public void setIdCardFilePath(String idCardFilePath) {
+        this.idCardFilePath = idCardFilePath;
+    }
+
+    public LocalDate getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    // === UTILITAR ===
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", role='" + role + '\'' +
+                ", active=" + active +
+                ", registrationDate=" + registrationDate +
+                '}';
+    }
 }

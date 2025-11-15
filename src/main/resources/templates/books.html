@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library - Books</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f8f8; padding: 30px; }
+        h1 { color: #333; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; background: white; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        th, td { padding: 10px 15px; border: 1px solid #ddd; text-align: center; }
+        th { background-color: #444; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #007bff; }
+    </style>
+</head>
+<body>
+<h1>📚 Library Books</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>ISBN</th>
+        <th>Price</th>
+        <th>Available</th>
+        <th>Category</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+        <td th:text="${book.isbn}"></td>
+        <td th:text="${book.price}"></td>
+        <td th:text="${book.available}"></td>
+        <td th:text="${book.category.name}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/categories">📂 View Categories</a>
+</body>
+</html>
