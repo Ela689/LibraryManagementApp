@@ -1,102 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ro">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Library Management - Home</title>
+    <title>Library Management App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f8f9fa;
             margin: 0;
             padding: 0;
-            text-align: center;
         }
 
         header {
-            background-color: #004080;
+            background: #004080;
             color: white;
-            padding: 20px;
+            padding: 15px;
+            text-align: center;
         }
 
         .container {
-            margin-top: 40px;
+            text-align: center;
+            margin-top: 50px;
         }
 
         .card {
-            background-color: white;
-            width: 400px;
-            margin: 0 auto;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .admin {
-            color: #004080;
-            font-weight: bold;
-        }
-
-        .user {
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        a.button {
+            background: white;
+            padding: 30px;
             display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background: #004080;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: 0.3s;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        a.button:hover {
-            background: #0066cc;
+        button {
+            padding: 10px 20px;
+            margin: 8px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-users, .btn-books {
+            background-color: #004080;
+        }
+
+        .btn-logout {
+            background-color: #dc3545;
         }
 
         footer {
             margin-top: 50px;
-            color: #666;
+            color: gray;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
 <header>
-    <h1>Library Management App</h1>
+    <h2>Library Management App</h2>
 </header>
 
 <div class="container">
     <div class="card">
-        <h2 th:text="${welcomeMessage}"></h2>
+        <h3>Welcome, <span th:text="${#authentication.name}"></span> (<span th:text="${#authentication.authorities[0].authority}"></span>)</h3>
+        <p>Administrator panel</p>
 
-        <!-- Dacă e ADMIN -->
-        <div th:if="${user != null and user.role == 'ADMIN'}" class="admin">
-            <p>Panou administrator</p>
-            <a href="/admin/users" class="button">Gestionare utilizatori</a>
-            <a href="/admin/books" class="button">Gestionare cărți</a>
-            <a href="/logout" class="button" style="background:red;">Deconectare</a>
-        </div>
-
-        <!-- Dacă e USER -->
-        <div th:if="${user != null and user.role == 'USER'}" class="user">
-            <p>Secțiunea cititor</p>
-            <a href="/books" class="button">Vizualizare cărți</a>
-            <a href="/logout" class="button" style="background:red;">Deconectare</a>
-        </div>
-
-        <!-- Dacă nu e autentificat -->
-        <div th:if="${user == null}">
-            <p>Te rog să te conectezi pentru a continua.</p>
-            <a href="/login" class="button">Autentificare</a>
-            <a href="/register" class="button">Creare cont</a>
+        <div>
+            <a href="/admin/users"><button class="btn-users">Manage Users</button></a>
+            <a href="/admin/books"><button class="btn-books">Manage Books</button></a>
+            <a href="/logout"><button class="btn-logout">Logout</button></a>
         </div>
     </div>
 </div>
 
 <footer>
-    <p>© 2025 Library Management App | Proiect Java - Daniela Pavlenco</p>
+    © 2025 Library Management App | Java Project - Daniela Pavlenco
 </footer>
 </body>
 </html>
