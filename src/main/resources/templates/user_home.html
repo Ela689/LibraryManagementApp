@@ -2,13 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>User Dashboard</title>
     <style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
             background: #f5f7fa;
             margin: 0;
+            padding: 0;
         }
+
         header {
             background: #004080;
             color: white;
@@ -17,20 +19,31 @@
             font-size: 22px;
             font-weight: 600;
         }
+
         .container {
             text-align: center;
             margin-top: 80px;
         }
+
         .card {
             background: white;
-            width: 420px;
+            width: 400px;
             margin: auto;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .card h3 { color: #004080; margin-bottom: 10px; }
-        .card p { color: #333; margin-bottom: 25px; }
+
+        .card h3 {
+            color: #004080;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #333;
+            margin-bottom: 25px;
+        }
+
         button {
             background-color: #004080;
             border: none;
@@ -41,9 +54,19 @@
             transition: 0.3s;
             margin: 8px;
         }
-        button:hover { background-color: #0055cc; }
-        .logout { background-color: #dc3545; }
-        .logout:hover { background-color: #c82333; }
+
+        button:hover {
+            background-color: #0055cc;
+        }
+
+        .logout {
+            background-color: #dc3545;
+        }
+
+        .logout:hover {
+            background-color: #c82333;
+        }
+
         footer {
             text-align: center;
             margin-top: 80px;
@@ -58,12 +81,12 @@
 
 <div class="container">
     <div class="card">
-        <h3 th:text="'Welcome, ' + ${user.username} + ' (ADMIN)'"></h3>
-        <p>Administrator panel</p>
+        <h3 th:text="'Welcome, ' + ${user.username} + ' (USER)'"></h3>
+        <p>Your personal library dashboard</p>
 
         <div>
-            <a href="/admin/users"><button>Manage Users</button></a>
-            <a href="/books"><button>Manage Books</button></a>
+            <a href="/books"><button>View Available Books</button></a>
+            <a href="/borrowed"><button>My Borrowed Books</button></a>
             <a href="/logout"><button class="logout">Logout</button></a>
         </div>
     </div>

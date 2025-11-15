@@ -3,10 +3,17 @@ package com.example.librarymanagementapp.controller;
 import com.example.librarymanagementapp.model.User;
 import com.example.librarymanagementapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
@@ -16,46 +23,50 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
-    // Pagina principală de gestionare a utilizatorilor
     @GetMapping("/users")
     public String manageUsers(Model model) {
-        List<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
+        List<User> pendingUsers = userRepository.findByActiveFalse();
+        List<User> activeUsers = userRepository.findByActiveTrue();
+
+        model.addAttribute("pendingUsers", pendingUsers);
+        model.addAttribute("activeUsers", activeUsers);
         return "admin_users";
     }
 
-    // Activează un utilizator
     @PostMapping("/activate/{id}")
     public String activateUser(@PathVariable Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
+        userRepository.findById(id).ifPresent(user -> {
             user.setActive(true);
             userRepository.save(user);
-        }
+        });
         return "redirect:/admin/users";
     }
 
-    // Dezactivează un utilizator
     @PostMapping("/deactivate/{id}")
     public String deactivateUser(@PathVariable Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
+        userRepository.findById(id).ifPresent(user -> {
             user.setActive(false);
             userRepository.save(user);
-        }
+        });
         return "redirect:/admin/users";
     }
 
-    // Șterge un utilizator
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
         return "redirect:/admin/users";
     }
 
-    // Pagina de gestionare a cărților (placeholder deocamdată)
-    @GetMapping("/books")
-    public String manageBooks() {
-        return "admin_books";
+    // ✅ Download ID Card
+    @GetMapping("/download/{id}")
+    @ResponseBody
+    public Resource downloadIdCard(@PathVariable Long id) throws MalformedURLException {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null || user.getIdCardFilePath() == null) {
+            return null;
+        }
+
+        Path path = Paths.get(user.getIdCardFilePath());
+        return new UrlResource(path.toUri());
     }
 }
