@@ -16,9 +16,10 @@ public class BookController {
     private BookRepository bookRepository;
 
     @GetMapping("/books")
-    public String listBooks(Model model) {
+    public String showBooks(Model model) {
         List<Book> books = bookRepository.findAll();
         model.addAttribute("books", books);
-        return "books"; // se va lega la books.html
+        return "admin_books"; // numele fișierului din templates
     }
+
 }

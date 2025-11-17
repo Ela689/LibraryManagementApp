@@ -65,7 +65,7 @@ public class MyRunner implements CommandLineRunner {
                 book.setIsbn("9780743273565");
                 book.setPrice(49.99);
                 book.setAvailable(true);
-                book.setCategory(fiction);
+                book.setCategory(fiction.getName());
                 bookRepository.save(book);
                 System.out.println("📖 Default book 'The Great Gatsby' added!");
             }

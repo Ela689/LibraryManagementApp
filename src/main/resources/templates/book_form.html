@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add/Edit Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">📖 Add or Edit Book</h2>
+
+    <form th:action="@{${#request.requestURI}}" th:object="${book}" method="post" class="bg-white p-4 rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" th:field="*{title}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Author</label>
+            <input type="text" th:field="*{author}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Edition</label>
+            <input type="text" th:field="*{edition}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Year</label>
+            <input type="number" th:field="*{year}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <input type="text" th:field="*{category}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Format Type</label>
+            <select th:field="*{formatType}" class="form-select" required>
+                <option value="Physical">Physical</option>
+                <option value="Borrowable">Borrowable</option>
+                <option value="Ebook">Ebook</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Quantity</label>
+            <input type="number" th:field="*{quantity}" class="form-control">
+        </div>
+
+        <div class="mb-3" th:if="${book.formatType == 'Ebook'}">
+            <label class="form-label">File Path (PDF)</label>
+            <input type="text" th:field="*{filePath}" placeholder="/uploads/books/book.pdf" class="form-control">
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" th:field="*{available}" class="form-check-input">
+            <label class="form-check-label">Available</label>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-success px-4">Save</button>
+            <a href="/admin/books" class="btn btn-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>
