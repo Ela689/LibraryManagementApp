@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f0f4fa;
+            margin: 0;
+            text-align: center;
+        }
+        h1 {
+            color: #004080;
+            margin-top: 60px;
+        }
+        .button-container {
+            margin-top: 60px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            margin: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0059cc;
+        }
+        .logout {
+            background-color: #dc3545;
+        }
+        .logout:hover {
+            background-color: #b12d39;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📚 Admin Dashboard</h1>
+
+<div class="button-container">
+    <a href="/admin/users"><button>👤 Manage Users</button></a>
+    <a href="/admin/books"><button>📖 Manage Books</button></a>
+    <a href="/logout"><button class="logout">🚪 Logout</button></a>
+</div>
+
+</body>
+</html>

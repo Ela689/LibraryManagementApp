@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f1f5fb;
+        }
+        .card {
+            margin-top: 50px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #0d3b66;
+            color: white;
+            font-size: 1.4rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .btn-warning {
+            background-color: #f0ad4e;
+            border: none;
+        }
+        .btn-warning:hover {
+            background-color: #ec971f;
+        }
+        .btn-danger {
+            background-color: #d9534f;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card mx-auto" style="max-width: 700px;">
+        <div class="card-header">
+            <i class="bi bi-person-fill"></i> User Details
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless">
+                <tbody>
+                <tr>
+                    <th>ID:</th>
+                    <td th:text="${user.id}"></td>
+                </tr>
+                <tr>
+                    <th>Username:</th>
+                    <td th:text="${user.username}"></td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td th:text="${user.email}"></td>
+                </tr>
+                <tr>
+                    <th>Phone:</th>
+                    <td th:text="${user.phone}"></td>
+                </tr>
+                <tr>
+                    <th>Role:</th>
+                    <td th:text="${user.role}"></td>
+                </tr>
+                <tr>
+                    <th>Active:</th>
+                    <td th:text="${user.active}"></td>
+                </tr>
+                <tr>
+                    <th>Registration Date:</th>
+                    <td th:text="${user.registrationDate}"></td>
+                </tr>
+                <tr>
+                    <th>ID Card File:</th>
+                    <td>
+                        <a th:href="${user.idCardFilePath}" target="_blank">📎 View File</a>
+                        <span th:if="${user.idCardFilePath != null}"> | </span>
+                        <a th:href="${user.idCardFilePath}" download class="btn btn-sm btn-outline-primary">⬇ Download</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="text-center mt-4">
+                <!-- ✅ Confirm before activate/deactivate -->
+                <form th:action="@{'/admin/users/deactivate/' + ${user.id}}" method="post" style="display:inline;"
+                      onsubmit="return confirm('Are you sure you want to change this user\'s active status?');">
+                    <button type="submit" class="btn btn-warning"
+                            th:text="${user.active} ? 'Deactivate' : 'Activate'"></button>
+                </form>
+
+                <!-- ✅ Confirm before delete -->
+                <form th:action="@{'/admin/users/delete/' + ${user.id}}" method="post" style="display:inline;"
+                      onsubmit="return confirm('Are you sure you want to delete this user?');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+
+                <a href="/admin/users" class="btn btn-secondary">← Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</body>
+</html>
