@@ -2,16 +2,15 @@ package com.example.librarymanagementapp.controller;
 
 import com.example.librarymanagementapp.model.User;
 import com.example.librarymanagementapp.repository.UserRepository;
+import com.example.librarymanagementapp.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.time.LocalDate;
 
 @Controller
@@ -23,7 +22,8 @@ public class AuthController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    private final String uploadDir = "uploads/idcards";
+    @Autowired
+    private FileStorageService fileStorageService;
 
     // ✅ LOGIN PAGE
     @GetMapping("/login")
@@ -44,23 +44,13 @@ public class AuthController {
                            @RequestParam("idCardFile") MultipartFile file,
                            Model model) {
         try {
-            // 1️⃣ Salvăm fișierul în folderul uploads/idcards
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            Path uploadPath = Paths.get(uploadDir);
+            String filePath = fileStorageService.saveFile(file);
 
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // 2️⃣ Completăm datele utilizatorului
-            user.setIdCardFileName(fileName);
-            user.setIdCardFilePath(filePath.toString());
+            user.setIdCardFileName(file.getOriginalFilename());
+            user.setIdCardFilePath(filePath);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole("USER");
-            user.setActive(false); // ❗ implicit inactiv până la aprobare
+            user.setActive(false); // implicit inactive until admin approval
             user.setRegistrationDate(LocalDate.now());
 
             userRepository.save(user);
@@ -74,18 +64,7 @@ public class AuthController {
         }
     }
 
-
-    // ✅ PAGE FOR NORMAL USER
-   // @GetMapping("/user_wait")
-    //public String showUserWaitPage(Model model, @SessionAttribute(name = "username", required = false) String username) {
-      //  if (username != null) {
-        //    User user = userRepository.findByUsername(username);
-           // model.addAttribute("user", user);
-        //}
-        //return "user_wait";
-    //}
-
-    // ✅ SALVARE USER ÎN SESIUNE DUPĂ LOGIN
+    // ✅ LOGIN SUCCESS REDIRECT
     @PostMapping("/login-success")
     public String loginSuccess(@RequestParam String username, Model model) {
         model.addAttribute("username", username);

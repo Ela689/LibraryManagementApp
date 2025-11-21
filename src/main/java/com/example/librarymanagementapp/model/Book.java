@@ -16,28 +16,25 @@ public class Book {
     private int year;
     private String category;
 
+    // 🆕 format (Physical | Borrowable | Ebook)
     @Column(nullable = false)
-    private String formatType; // Physical | Borrowable | Ebook
+    private String format;
 
     private int quantity;
-    private int borrowed; // for borrowable books
-
+    private int borrowed;
     private boolean available;
-
-    private String filePath; // for ebooks (PDF path)
-
+    private String filePath;
     private double price;
     private String isbn;
 
     // ===========================
-    // 🧱 Constructors
+    // 🔹 Constructors
     // ===========================
 
-    public Book() {
-    }
+    public Book() {}
 
     public Book(String title, String author, String edition, int year,
-                String category, String formatType, int quantity,
+                String category, String format, int quantity,
                 int borrowed, boolean available, String filePath,
                 double price, String isbn) {
 
@@ -46,7 +43,7 @@ public class Book {
         this.edition = edition;
         this.year = year;
         this.category = category;
-        this.formatType = formatType;
+        this.format = format;
         this.quantity = quantity;
         this.borrowed = borrowed;
         this.available = available;
@@ -56,116 +53,52 @@ public class Book {
     }
 
     // ===========================
-    // 🧩 Getters & Setters
+    // 🔹 Getters & Setters
     // ===========================
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getEdition() { return edition; }
+    public void setEdition(String edition) { this.edition = edition; }
 
-    public String getAuthor() {
-        return author;
-    }
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getEdition() {
-        return edition;
-    }
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 
-    public void setEdition(String edition) {
-        this.edition = edition;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public int getYear() {
-        return year;
-    }
+    public int getBorrowed() { return borrowed; }
+    public void setBorrowed(int borrowed) { this.borrowed = borrowed; }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
 
-    public String getCategory() {
-        return category;
-    }
+    public String getFilePath() { return filePath; }
+    public void setFilePath(String filePath) { this.filePath = filePath; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public String getFormatType() {
-        return formatType;
-    }
-
-    public void setFormatType(String formatType) {
-        this.formatType = formatType;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public int getBorrowed() {
-        return borrowed;
-    }
-
-    public void setBorrowed(int borrowed) {
-        this.borrowed = borrowed;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
 
     // ===========================
-    // 📜 toString() for debug/log
+    // 🔹 toString() (debug)
     // ===========================
+
     @Override
     public String toString() {
         return "Book{" +
@@ -175,7 +108,7 @@ public class Book {
                 ", edition='" + edition + '\'' +
                 ", year=" + year +
                 ", category='" + category + '\'' +
-                ", formatType='" + formatType + '\'' +
+                ", format='" + format + '\'' +
                 ", quantity=" + quantity +
                 ", borrowed=" + borrowed +
                 ", available=" + available +

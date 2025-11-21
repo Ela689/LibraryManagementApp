@@ -1,3 +1,4 @@
+//SecurityConfig.java
 package com.example.librarymanagementapp.config;
 
 import com.example.librarymanagementapp.service.CustomUserDetailsService;
@@ -40,19 +41,22 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Acces liber doar la login & register
+                        // ✅ Acces liber doar la login, register și resurse statice
                         .requestMatchers("/login", "/register", "/css/**", "/uploads/**").permitAll()
 
-                        // ✅ Doar ADMIN poate accesa aceste zone
-                        .requestMatchers("/admin/**", "/home", "/books").hasAuthority("ADMIN")
+                        // ✅ Acces ADMIN
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
 
-                        // ✅ Userii obișnuiți pot accesa doar zonele permise
+                        // ✅ Acces comun după login (ADMIN + USER)
+                        .requestMatchers("/home", "/books").hasAnyAuthority("ADMIN", "USER")
+
+                        // ✅ Doar USER poate accesa aceste rute
                         .requestMatchers("/user_wait", "/profile/**").hasAuthority("USER")
 
-                        // Orice altă cerere — se cere autentificare
+                        // 🔒 Orice altă cerere necesită autentificare
                         .anyRequest().authenticated()
                 )
-                // ✅ Configurăm login-ul cu redirecționare dinamică
+                // ✅ Configurăm login-ul dinamic
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler((request, response, authentication) -> {
@@ -74,10 +78,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                // ✅ Pagina de eroare 403
+                // ✅ Pagină de eroare 403
                 .exceptionHandling(ex -> ex.accessDeniedPage("/error_403"));
 
         return http.build();
     }
-
 }

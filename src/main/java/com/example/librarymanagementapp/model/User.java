@@ -16,7 +16,9 @@ public class User {
     private String password;
     private String phone;
     private String role;
+
     private boolean active;
+    private boolean enabled = true; // ✅ nou: activare cont
 
     private String idCardFileName;
     private String idCardFilePath;
@@ -44,6 +46,9 @@ public class User {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public boolean isEnabled() { return enabled; }        // ✅ getter nou
+    public void setEnabled(boolean enabled) { this.enabled = enabled; } // ✅ setter nou
 
     public String getIdCardFileName() { return idCardFileName; }
     public void setIdCardFileName(String idCardFileName) { this.idCardFileName = idCardFileName; }

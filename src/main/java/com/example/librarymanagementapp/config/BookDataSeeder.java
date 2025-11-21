@@ -1,12 +1,14 @@
 package com.example.librarymanagementapp.config;
 
 import com.example.librarymanagementapp.model.Book;
+import com.example.librarymanagementapp.model.User;
 import com.example.librarymanagementapp.repository.BookRepository;
+import com.example.librarymanagementapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -17,9 +19,32 @@ public class BookDataSeeder implements CommandLineRunner {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @Override
     public void run(String... args) {
-        // if DB already has books, skip seeding
+        // ============================
+        // 👤 Seed admin account
+        // ============================
+        if (userRepository.findByUsername("admin") == null) {
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setRole("ADMIN");
+            admin.setEnabled(true);
+            userRepository.save(admin);
+            System.out.println("✅ Default admin account created: username=admin, password=admin123");
+        } else {
+            System.out.println("ℹ️ Admin account already exists.");
+        }
+
+        // ============================
+        // 📚 Seed books if empty
+        // ============================
         if (bookRepository.count() > 0) {
             System.out.println("📚 Books already exist, skipping seeding...");
             return;
@@ -41,7 +66,6 @@ public class BookDataSeeder implements CommandLineRunner {
         List<String> formats = Arrays.asList("Physical", "Borrowable", "Ebook");
 
         Random random = new Random();
-
         int idCounter = 1;
 
         for (int i = 0; i < 50; i++) {
@@ -63,7 +87,6 @@ public class BookDataSeeder implements CommandLineRunner {
             double price = 20 + (random.nextInt(80)); // price between 20–100
             String isbn = "9780" + (100000000 + random.nextInt(900000000));
 
-            // ✅ use constructor from Book.java
             Book book = new Book(
                     title,
                     author,
