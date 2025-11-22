@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Book Details</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .card {
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .book-header {
+            padding: 25px;
+            color: white;
+        }
+
+        .icon-lg {
+            font-size: 48px;
+        }
+
+        .book-info label {
+            font-weight: 600;
+        }
+
+        .pdf-btn {
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5 mb-5">
+
+    <div class="card shadow">
+
+        <!-- =========================== -->
+        <!-- HEADER (color depends on format) -->
+        <!-- =========================== -->
+        <div class="book-header"
+             th:classappend="${book.format == 'Ebook'} ? 'bg-info'
+                             : (${book.format == 'Borrowable'} ? 'bg-warning' : 'bg-success')">
+
+            <div class="d-flex align-items-center">
+                <div class="icon-lg me-3">
+                    <span th:if="${book.format == 'Ebook'}">📙</span>
+                    <span th:if="${book.format == 'Borrowable'}">📘</span>
+                    <span th:if="${book.format == 'Physical'}">📗</span>
+                </div>
+
+                <div>
+                    <h2 class="fw-bold" th:text="${book.title}"></h2>
+                    <h5 th:text="'by ' + ${book.author}"></h5>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =========================== -->
+        <!-- BODY -->
+        <!-- =========================== -->
+        <div class="p-4">
+
+            <div class="row book-info">
+
+                <div class="col-md-6 mb-3">
+                    <label>Category:</label>
+                    <div th:text="${book.category}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Year:</label>
+                    <div th:text="${book.year}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Edition:</label>
+                    <div th:text="${book.edition}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Format:</label>
+                    <div th:text="${book.format}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3" th:if="${book.format != 'Ebook'}">
+                    <label>Quantity:</label>
+                    <div th:text="${book.quantity}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3" th:if="${book.format != 'Ebook'}">
+                    <label>Borrowed:</label>
+                    <div th:text="${book.borrowed}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Price:</label>
+                    <div>
+                        <span th:text="${book.price}"></span> RON
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>ISBN:</label>
+                    <div th:text="${book.isbn}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Available:</label>
+                    <div th:text="${book.available ? 'Yes' : 'No'}"></div>
+                </div>
+
+            </div>
+
+
+            <!-- =========================== -->
+            <!-- PDF LINK FOR EBOOK -->
+            <!-- =========================== -->
+            <div class="mt-4" th:if="${book.format == 'Ebook' and book.filePath != null}">
+                <a th:href="@{${book.filePath}}" target="_blank"
+                   class="btn btn-outline-info pdf-btn px-4 py-2">
+                    📄 Open PDF
+                </a>
+            </div>
+
+        </div>
+
+
+        <!-- =========================== -->
+        <!-- FOOTER BUTTONS -->
+        <!-- =========================== -->
+        <div class="p-4 border-top bg-light d-flex justify-content-between">
+
+            <a href="/admin/books" class="btn btn-secondary px-4">← Back</a>
+
+            <div>
+                <a th:href="@{'/admin/books/edit/' + ${book.id}}"
+                   class="btn btn-success px-4">✏ Edit</a>
+
+                <a th:href="@{'/admin/books/delete/' + ${book.id}}"
+                   class="btn btn-danger px-4 ms-2"
+                   onclick="return confirm('Are you sure you want to delete this book?');">🗑 Delete</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

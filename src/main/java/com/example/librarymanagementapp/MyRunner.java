@@ -1,11 +1,10 @@
 package com.example.librarymanagementapp;
 
 import com.example.librarymanagementapp.model.User;
-import com.example.librarymanagementapp.model.Book;
 import com.example.librarymanagementapp.model.Category;
 import com.example.librarymanagementapp.repository.UserRepository;
-import com.example.librarymanagementapp.repository.BookRepository;
 import com.example.librarymanagementapp.repository.CategoryRepository;
+import com.example.librarymanagementapp.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,46 +30,52 @@ public class MyRunner implements CommandLineRunner {
 
         System.out.println("🚀 Checking initial data setup...");
 
-        // ✅ Create default admin if not exists
+        // ================================
+        // 1️⃣ CREATE ADMIN IF MISSING
+        // ================================
         if (userRepository.findByUsername("admin") == null) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123")); // 🔐 Encrypt password
+            admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setEmail("admin@library.com");
             admin.setPhone("0700000000");
             admin.setRole("ADMIN");
             admin.setActive(true);
             userRepository.save(admin);
-            System.out.println("✅ Admin user created: username=admin, password=admin123");
+
+            System.out.println("✅ Admin user created.");
         } else {
             System.out.println("ℹ️ Admin user already exists.");
         }
 
-        // ✅ Create default category if none exists
+        // ================================
+        // 2️⃣ CREATE 6 DEFAULT CATEGORIES
+        // ================================
         if (categoryRepository.count() == 0) {
-            Category fiction = new Category();
-            fiction.setName("Fiction");
-            fiction.setDescription("Fictional books category");
-            categoryRepository.save(fiction);
-            System.out.println("📚 Default category 'Fiction' created!");
-        }
+            String[] categories = {
+                    "Art",
+                    "Fiction-Romance-Thriller",
+                    "Medicine",
+                    "Philosophy",
+                    "Science",
+                    "Technology"
+            };
 
-        // ✅ Create default book if none exists
-        if (bookRepository.count() == 0) {
-            Category fiction = categoryRepository.findByName("Fiction");
-            if (fiction != null) {
-                Book book = new Book();
-                book.setTitle("The Great Gatsby");
-                book.setAuthor("F. Scott Fitzgerald");
-                book.setIsbn("9780743273565");
-                book.setPrice(49.99);
-                book.setAvailable(true);
-                book.setCategory(fiction.getName());
-                bookRepository.save(book);
-                System.out.println("📖 Default book 'The Great Gatsby' added!");
+            for (String c : categories) {
+                Category cat = new Category();
+                cat.setName(c);
+                categoryRepository.save(cat);
             }
+
+            System.out.println("📚 Default 6 categories created.");
+        } else {
+            System.out.println("ℹ️ Categories already exist.");
         }
 
+        // ================================
+        // 3️⃣ DO NOT GENERATE BOOKS HERE
+        // ================================
+        System.out.println("📘 No auto-books inserted at startup.");
         System.out.println("✅ Library Management App is running...");
     }
 }
