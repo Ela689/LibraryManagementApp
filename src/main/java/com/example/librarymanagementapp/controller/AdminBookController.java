@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,40 +30,34 @@ public class AdminBookController {
     @Autowired
     private DigitalBookRepository digitalBookRepository;
 
-    // ===============================
-    // LIST ALL BOOKS IN 3 SECTIONS
-    // ===============================
+    // ================================
+    // LISTĂ COMPLETĂ PENTRU ADMIN
+    // ================================
     @GetMapping
     public String listBooks(Model model) {
 
-        // ===========================
-        // PHYSICAL
-        // ===========================
-        List<Book> physical = bookRepository.findByEdition("PHYSICAL");
+        // ======== PHYSICAL BOOKS ========
+        List<Book> physical = bookRepository.findByFormat("PHYSICAL");
         Map<String, List<Book>> physicalGrouped = new LinkedHashMap<>();
 
         for (Book b : physical) {
             physicalGrouped.computeIfAbsent(b.getCategory(), k -> new ArrayList<>()).add(b);
         }
 
-        // ===========================
-        // BORROWABLE
-        // ===========================
-        List<Book> borrowable = bookRepository.findByEdition("BORROWABLE");
+        // ======== BORROWABLE BOOKS ========
+        List<Book> borrowable = bookRepository.findByFormat("BORROWABLE");
         Map<String, List<Book>> borrowableGrouped = new LinkedHashMap<>();
 
         for (Book b : borrowable) {
             borrowableGrouped.computeIfAbsent(b.getCategory(), k -> new ArrayList<>()).add(b);
         }
 
-        // ===========================
-        // DIGITAL
-        // ===========================
+        // ======== DIGITAL BOOKS GROUPED ========
         List<DigitalBook> ebooks = digitalBookRepository.findAll();
         Map<String, List<DigitalBook>> digitalGrouped = new LinkedHashMap<>();
 
-        for (DigitalBook e : ebooks) {
-            digitalGrouped.computeIfAbsent(e.getCategory(), k -> new ArrayList<>()).add(e);
+        for (DigitalBook eb : ebooks) {
+            digitalGrouped.computeIfAbsent(eb.getCategory(), k -> new ArrayList<>()).add(eb);
         }
 
         model.addAttribute("physicalBooks", physicalGrouped);
@@ -72,46 +67,83 @@ public class AdminBookController {
         return "admin_books";
     }
 
-
-    // ===========================
+    // ================================
     // VIEW PDF
-    // ===========================
+    // ================================
     @GetMapping("/open/{id}")
-    public ResponseEntity<Resource> openPdf(@PathVariable Long id) throws MalformedURLException {
+    public ResponseEntity<Resource> openPdf(@PathVariable Long id) throws IOException {
 
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
         if (ebook == null) return ResponseEntity.notFound().build();
 
-        Path pdf = Paths.get("src/main/resources/static/books/" +
+        Path pdfPath = Paths.get("src/main/resources/static/books/" +
                 ebook.getCategory() + "/" + ebook.getFileName());
 
-        Resource res = new UrlResource(pdf.toUri());
-        if (!res.exists()) return ResponseEntity.notFound().build();
+        Resource resource = new UrlResource(pdfPath.toUri());
+        if (!resource.exists()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(res);
+                .body(resource);
     }
 
-    // ===========================
+    // ================================
     // DOWNLOAD PDF
-    // ===========================
+    // ================================
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws MalformedURLException {
 
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
         if (ebook == null) return ResponseEntity.notFound().build();
 
-        Path pdf = Paths.get("src/main/resources/static/books/" +
+        Path pdfPath = Paths.get("src/main/resources/static/books/" +
                 ebook.getCategory() + "/" + ebook.getFileName());
 
-        Resource res = new UrlResource(pdf.toUri());
-        if (!res.exists()) return ResponseEntity.notFound().build();
+        Resource resource = new UrlResource(pdfPath.toUri());
+        if (!resource.exists()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + ebook.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ebook.getFileName() + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(res);
+                .body(resource);
+    }
+
+    // ================================
+    // DELETE DIGITAL BOOK
+    // ================================
+    @GetMapping("/delete/{id}")
+    public String deleteEbook(@PathVariable Long id) {
+        digitalBookRepository.deleteById(id);
+        return "redirect:/admin/books";
+    }
+
+    // ================================
+    // EDIT FORM
+    // ================================
+    @GetMapping("/edit/{id}")
+    public String editEbookForm(@PathVariable Long id, Model model) {
+        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+        model.addAttribute("ebook", ebook);
+        return "edit_ebook";
+    }
+
+    // ================================
+    // SAVE EDITED BOOK
+    // ================================
+    @PostMapping("/edit/{id}")
+    public String updateEbook(@PathVariable Long id,
+                              @ModelAttribute DigitalBook updated) {
+
+        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+
+        if (ebook != null) {
+            ebook.setTitle(updated.getTitle());
+            ebook.setAuthor(updated.getAuthor());
+            ebook.setYear(updated.getYear());
+            ebook.setCategory(updated.getCategory());
+            digitalBookRepository.save(ebook);
+        }
+
+        return "redirect:/admin/books";
     }
 }

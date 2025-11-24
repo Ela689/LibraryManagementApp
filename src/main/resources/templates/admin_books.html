@@ -92,17 +92,16 @@
             font-size: 14px;
         }
 
-        .download-btn {
+        .btn {
             display: inline-block;
-            margin-left: 15px;
             padding: 4px 10px;
             background: #007bff;
             color: white;
             border-radius: 5px;
             font-size: 12px;
             text-decoration: none;
+            margin-left: 10px;
         }
-
     </style>
 </head>
 
@@ -115,84 +114,39 @@
 
 <div class="section-container">
 
-    <!-- ========================== -->
-    <!-- PHYSICAL BOOKS -->
-    <!-- ========================== -->
-    <div class="section-box">
-        <div class="section-title">
-            <i class="fa-solid fa-book-open"></i> Physical Library Books
-        </div>
-
-        <div th:each="category : ${physicalBooks}">
-            <details>
-                <summary th:text="${category.key}"></summary>
-
-                <div th:each="book : ${category.value}" class="book-item">
-                    <span class="book-info"
-                          th:text="${book.title + ' - ' + book.author + ' (' + book.year + ')'}"></span>
-                </div>
-            </details>
-        </div>
-    </div>
-
-
-    <!-- ========================== -->
-    <!-- BORROWABLE BOOKS -->
-    <!-- ========================== -->
-    <div class="section-box borrowable">
-        <div class="section-title">
-            <i class="fa-solid fa-hand-holding"></i> Borrowable Books
-        </div>
-
-        <div th:each="category : ${borrowableBooks}">
-            <details>
-                <summary th:text="${category.key}"></summary>
-
-                <div th:each="book : ${category.value}" class="book-item">
-                    <span class="book-info"
-                          th:text="${book.title + ' - ' + book.author + ' (' + book.year + ')'}"></span>
-
-                    <span style="color:#007bff; font-weight:600; margin-left: 10px;">
-                        • In library:
-                        <span th:text="${book.quantity}"></span>
-                    </span>
-
-                    <span style="color:#d60000; font-weight:600; margin-left: 10px;">
-                        • Borrowed:
-                        <span th:text="${book.borrowed}"></span>
-                    </span>
-                </div>
-            </details>
-        </div>
-    </div>
-
-
-    <!-- ========================== -->
-    <!-- DIGITAL BOOKS (PDF) -->
-    <!-- ========================== -->
+    <!-- =======================================
+         DIGITAL BOOKS
+    ======================================== -->
     <div class="section-box digital">
         <div class="section-title">
             <i class="fa-solid fa-tablet-screen-button"></i> Digital Books (PDF)
         </div>
 
-        <!-- GRUPARE PE SUBCATEGORII -->
         <div th:each="category : ${digitalBooksGrouped}">
             <details>
                 <summary th:text="${category.key}"></summary>
 
                 <div th:each="ebook : ${category.value}" class="book-item">
-                    <span class="book-info"
-                          th:text="${ebook.title + ' - ' + ebook.author + ' (' + ebook.year + ')'}"></span>
+                    <span th:text="${ebook.title + ' - ' + ebook.author + ' (' + ebook.year + ')' }"></span>
 
-                    <a th:href="@{'/admin/books/open/' + ${ebook.id}}"
-                       class="download-btn">
+                    <a th:href="@{'/admin/books/open/' + ${ebook.id}}" class="btn">
                         <i class="fa-solid fa-eye"></i> View
                     </a>
 
-                    <a th:href="@{'/admin/books/download/' + ${ebook.id}}"
-                       class="download-btn">
+                    <a th:href="@{'/admin/books/download/' + ${ebook.id}}" class="btn">
                         <i class="fa-solid fa-download"></i> PDF
                     </a>
+
+                    <a th:href="@{'/admin/books/edit/' + ${ebook.id}}" class="btn" style="background:#ffa502;">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+
+                    <a th:href="@{'/admin/books/delete/' + ${ebook.id}}" class="btn"
+                       style="background:#ff4757;"
+                       onclick="return confirm('Delete this book?');">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </a>
+
                 </div>
             </details>
         </div>
