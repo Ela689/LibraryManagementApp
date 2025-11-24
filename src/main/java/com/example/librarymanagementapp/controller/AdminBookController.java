@@ -1,9 +1,10 @@
 package com.example.librarymanagementapp.controller;
 
-import com.example.librarymanagementapp.model.Book;
 import com.example.librarymanagementapp.model.DigitalBook;
-import com.example.librarymanagementapp.repository.BookRepository;
+import com.example.librarymanagementapp.model.DigitalBookHistory;
+import com.example.librarymanagementapp.repository.DigitalBookHistoryRepository;
 import com.example.librarymanagementapp.repository.DigitalBookRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,34 +26,18 @@ import java.util.*;
 public class AdminBookController {
 
     @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
     private DigitalBookRepository digitalBookRepository;
 
-    // ================================
-    // LISTĂ COMPLETĂ PENTRU ADMIN
-    // ================================
+    @Autowired
+    private DigitalBookHistoryRepository historyRepository;
+
+
+    // =====================================================
+    // LIST DIGITAL BOOKS
+    // =====================================================
     @GetMapping
     public String listBooks(Model model) {
 
-        // ======== PHYSICAL BOOKS ========
-        List<Book> physical = bookRepository.findByFormat("PHYSICAL");
-        Map<String, List<Book>> physicalGrouped = new LinkedHashMap<>();
-
-        for (Book b : physical) {
-            physicalGrouped.computeIfAbsent(b.getCategory(), k -> new ArrayList<>()).add(b);
-        }
-
-        // ======== BORROWABLE BOOKS ========
-        List<Book> borrowable = bookRepository.findByFormat("BORROWABLE");
-        Map<String, List<Book>> borrowableGrouped = new LinkedHashMap<>();
-
-        for (Book b : borrowable) {
-            borrowableGrouped.computeIfAbsent(b.getCategory(), k -> new ArrayList<>()).add(b);
-        }
-
-        // ======== DIGITAL BOOKS GROUPED ========
         List<DigitalBook> ebooks = digitalBookRepository.findAll();
         Map<String, List<DigitalBook>> digitalGrouped = new LinkedHashMap<>();
 
@@ -60,16 +45,14 @@ public class AdminBookController {
             digitalGrouped.computeIfAbsent(eb.getCategory(), k -> new ArrayList<>()).add(eb);
         }
 
-        model.addAttribute("physicalBooks", physicalGrouped);
-        model.addAttribute("borrowableBooks", borrowableGrouped);
         model.addAttribute("digitalBooksGrouped", digitalGrouped);
-
         return "admin_books";
     }
 
-    // ================================
+
+    // =====================================================
     // VIEW PDF
-    // ================================
+    // =====================================================
     @GetMapping("/open/{id}")
     public ResponseEntity<Resource> openPdf(@PathVariable Long id) throws IOException {
 
@@ -87,9 +70,10 @@ public class AdminBookController {
                 .body(resource);
     }
 
-    // ================================
+
+    // =====================================================
     // DOWNLOAD PDF
-    // ================================
+    // =====================================================
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws MalformedURLException {
 
@@ -108,28 +92,43 @@ public class AdminBookController {
                 .body(resource);
     }
 
-    // ================================
-    // DELETE DIGITAL BOOK
-    // ================================
+
+    // =====================================================
+    // DELETE + SAVE HISTORY
+    // =====================================================
     @GetMapping("/delete/{id}")
     public String deleteEbook(@PathVariable Long id) {
-        digitalBookRepository.deleteById(id);
+
+        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+
+        if (ebook != null) {
+            historyRepository.save(new DigitalBookHistory(ebook, "DELETED"));
+            digitalBookRepository.delete(ebook);
+        }
+
         return "redirect:/admin/books";
     }
 
-    // ================================
+
+    // =====================================================
     // EDIT FORM
-    // ================================
+    // =====================================================
     @GetMapping("/edit/{id}")
     public String editEbookForm(@PathVariable Long id, Model model) {
+
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+
+        if (ebook == null)
+            return "redirect:/admin/books";
+
         model.addAttribute("ebook", ebook);
         return "edit_ebook";
     }
 
-    // ================================
-    // SAVE EDITED BOOK
-    // ================================
+
+    // =====================================================
+    // SAVE EDIT RESULT
+    // =====================================================
     @PostMapping("/edit/{id}")
     public String updateEbook(@PathVariable Long id,
                               @ModelAttribute DigitalBook updated) {
@@ -137,13 +136,64 @@ public class AdminBookController {
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
 
         if (ebook != null) {
+
             ebook.setTitle(updated.getTitle());
             ebook.setAuthor(updated.getAuthor());
             ebook.setYear(updated.getYear());
             ebook.setCategory(updated.getCategory());
+            ebook.setFileName(updated.getFileName());
+
             digitalBookRepository.save(ebook);
         }
 
         return "redirect:/admin/books";
     }
+
+
+    // =====================================================
+    // HISTORY PAGE
+    // =====================================================
+    @GetMapping("/history")
+    public String history(Model model) {
+        model.addAttribute("history", historyRepository.findAll());
+        return "history_books";
+    }
+
+
+    // =====================================================
+    // RESTORE BOOK
+    // =====================================================
+    @GetMapping("/restore/{historyId}")
+    public String restoreBook(@PathVariable Long historyId) {
+
+        DigitalBookHistory h = historyRepository.findById(historyId).orElse(null);
+
+        if (h != null) {
+            DigitalBook restored = new DigitalBook(
+                    h.getTitle(),
+                    h.getAuthor(),
+                    h.getYear(),
+                    h.getCategory(),
+                    h.getFileName()
+            );
+
+            // salvăm cartea restaurată
+            digitalBookRepository.save(restored);
+
+            // ștergem intrarea din istoric
+            historyRepository.delete(h);
+        }
+
+        return "redirect:/admin/books/history";
+    }
+
+    // =====================================================
+    // CLEAR HISTORY (DELETE ALL)
+    // =====================================================
+    @GetMapping("/history/clear")
+    public String clearHistory() {
+        historyRepository.deleteAll();
+        return "redirect:/admin/books/history";
+    }
+
 }

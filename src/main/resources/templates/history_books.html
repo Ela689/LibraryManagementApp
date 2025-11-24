@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>History — Digital Books</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            width: 90%;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #005eff;
+            display: inline-block;
+        }
+
+        .top-buttons {
+            float: right;
+            margin-top: -10px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-left: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            color: white;
+        }
+
+        .btn-back {
+            background: #007bff;
+        }
+
+        .btn-clear {
+            background: #dc3545;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .restore-btn {
+            background: #28a745;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>History — Digital Books</h2>
+
+    <!-- ✨ Butoanele noi -->
+    <div class="top-buttons">
+        <a href="/admin/books" class="btn btn-back">⬅ Back to Books</a>
+        <a href="/admin/books/history/clear" class="btn btn-clear"
+           onclick="return confirm('Ești sigură că vrei să cureți TOT istoricul?')">
+            🗑 Clear History
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Action</th>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Restore</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="item : ${history}">
+            <td th:text="${item.id}"></td>
+            <td th:text="${item.action}"></td>
+            <td th:text="${item.title}"></td>
+            <td th:text="${item.date}"></td>
+
+            <td>
+                <a th:href="@{'/admin/books/restore/' + ${item.id}}"
+                   class="restore-btn">Restore</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
