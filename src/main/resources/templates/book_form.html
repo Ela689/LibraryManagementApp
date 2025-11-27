@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Add / Edit Book</title>
+    <title th:text="${ebook.id == null} ? 'Add New Book' : 'Edit Book'"></title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
     <style>
-        .card {
-            border-radius: 12px;
-        }
-        .hidden {
-            display: none !important;
-        }
+        .card { border-radius: 12px; }
     </style>
 </head>
 
@@ -23,10 +19,14 @@
     <div class="card p-4 shadow-sm">
 
         <h3 class="text-center text-primary mb-4">
-            📖 <span th:text="${book.id == null ? 'Add New Book' : 'Edit Book'}"></span>
+            <span th:text="${ebook.id == null} ? '📕 Add New Digital Book' : '✏ Edit Digital Book'"></span>
         </h3>
 
-        <form th:action="@{${#request.requestURI}}" th:object="${book}" method="post" enctype="multipart/form-data">
+        <form th:action="${ebook.id == null} ? @{/admin/books/add}
+                                            : @{/admin/books/edit/{id}(id=${ebook.id})}"
+              th:object="${ebook}"
+              method="post"
+              enctype="multipart/form-data">
 
             <!-- TITLE -->
             <div class="mb-3">
@@ -40,84 +40,41 @@
                 <input type="text" th:field="*{author}" class="form-control" required>
             </div>
 
-            <!-- EDITION -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Edition</label>
-                <input type="text" th:field="*{edition}" class="form-control">
-            </div>
-
             <!-- YEAR -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Year</label>
-                <input type="number" th:field="*{year}" class="form-control" min="1500" max="2025" required>
+                <input type="number" th:field="*{year}" class="form-control"
+                       min="1500" max="2030" required>
             </div>
 
-            <!-- CATEGORY (dropdown) -->
+            <!-- CATEGORY -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Category</label>
+
                 <select th:field="*{category}" class="form-select" required>
                     <option value="">-- select category --</option>
-                    <option>Art</option>
-                    <option>Fiction-Romance-Thriller</option>
-                    <option>Medicine</option>
-                    <option>Philosophy</option>
-                    <option>Science</option>
-                    <option>Technology</option>
+                    <option value="art">Art</option>
+                    <option value="fiction-romance-thriller">Fiction-Romance-Thriller</option>
+                    <option value="medicine">Medicine</option>
+                    <option value="philosophy">Philosophy</option>
+                    <option value="science">Science</option>
+                    <option value="technology">Technology</option>
                 </select>
             </div>
 
-            <!-- FORMAT -->
+            <!-- UPLOAD FILE -->
             <div class="mb-3">
-                <label class="form-label fw-semibold">Format</label>
-                <select th:field="*{format}" id="formatSelect" class="form-select" required>
-                    <option value="Physical">Physical</option>
-                    <option value="Borrowable">Borrowable</option>
-                    <option value="Ebook">Ebook</option>
-                </select>
-            </div>
-
-            <!-- QUANTITY (Physical & Borrowable only) -->
-            <div class="mb-3" id="quantityBox">
-                <label class="form-label fw-semibold">Quantity</label>
-                <input type="number" th:field="*{quantity}" class="form-control" min="1">
-            </div>
-
-            <!-- BORROWED (edit only, not for new ebook) -->
-            <div class="mb-3" id="borrowedBox" th:if="${book.id != null}">
-                <label class="form-label fw-semibold">Borrowed</label>
-                <input type="number" th:field="*{borrowed}" class="form-control" min="0">
-            </div>
-
-            <!-- UPLOAD PDF (Ebook only) -->
-            <div class="mb-3 hidden" id="pdfUploadBox">
-                <label class="form-label fw-semibold">Upload PDF</label>
+                <label class="form-label fw-semibold">PDF File</label>
                 <input type="file" name="file" accept="application/pdf" class="form-control">
 
-                <!-- Show existing file only in edit mode -->
-                <div th:if="${book.filePath != null}">
+                <div th:if="${ebook.fileName != null}">
                     <small class="text-muted">
                         Current file:
-                        <a th:href="@{${book.filePath}}" target="_blank">view PDF</a>
+                        <a th:href="@{'/admin/books/open/' + ${ebook.id}}" target="_blank">
+                            Open PDF
+                        </a>
                     </small>
                 </div>
-            </div>
-
-            <!-- PRICE -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Price (RON)</label>
-                <input type="number" th:field="*{price}" class="form-control" min="0" step="0.1">
-            </div>
-
-            <!-- ISBN -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold">ISBN</label>
-                <input type="text" th:field="*{isbn}" class="form-control">
-            </div>
-
-            <!-- AVAILABLE -->
-            <div class="form-check mb-4">
-                <input type="checkbox" th:field="*{available}" class="form-check-input">
-                <label class="form-check-label fw-semibold">Available</label>
             </div>
 
             <!-- BUTTONS -->
@@ -131,32 +88,6 @@
     </div>
 
 </div>
-
-
-<!-- ===================================== -->
-<!-- JAVASCRIPT – SHOW/HIDE logic -->
-<!-- ===================================== -->
-<script>
-    function adjustFields() {
-        const format = document.getElementById("formatSelect").value;
-        const pdfBox = document.getElementById("pdfUploadBox");
-        const quantityBox = document.getElementById("quantityBox");
-        const borrowedBox = document.getElementById("borrowedBox");
-
-        if (format === "Ebook") {
-            pdfBox.classList.remove("hidden");
-            quantityBox.classList.add("hidden");
-            if (borrowedBox) borrowedBox.classList.add("hidden");
-        } else {
-            pdfBox.classList.add("hidden");
-            quantityBox.classList.remove("hidden");
-            if (borrowedBox) borrowedBox.classList.remove("hidden");
-        }
-    }
-
-    document.getElementById("formatSelect").addEventListener("change", adjustFields);
-    window.onload = adjustFields;
-</script>
 
 </body>
 </html>

@@ -1,3 +1,4 @@
+//DigitalBook.java
 package com.example.librarymanagementapp.model;
 
 import jakarta.persistence.*;
@@ -18,15 +19,16 @@ public class DigitalBook {
     @Column(name = "file_name")
     private String fileName;
 
-    // câmpuri pentru consistență cu tabelul (important pentru RESTORE!)
+    // extra fields for compatibility
     private String format = "Digital";
     private int quantity = 1;
     private int borrowed = 0;
     private boolean available = true;
 
+    // empty constructor
     public DigitalBook() {}
 
-    // Constructor folosit la RESTORE
+    // constructor used for restore
     public DigitalBook(String title, String author, int year, String category, String fileName) {
         this.title = title;
         this.author = author;
@@ -34,15 +36,13 @@ public class DigitalBook {
         this.category = category;
         this.fileName = fileName;
 
-        // valori default cerute de tabel
         this.format = "Digital";
         this.quantity = 1;
         this.borrowed = 0;
         this.available = true;
     }
 
-    // ---------- GETTERS & SETTERS ----------
-
+    // GETTERS & SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

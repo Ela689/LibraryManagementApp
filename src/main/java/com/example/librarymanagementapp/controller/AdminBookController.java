@@ -14,11 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 
 @Controller
@@ -31,7 +31,6 @@ public class AdminBookController {
     @Autowired
     private DigitalBookHistoryRepository historyRepository;
 
-
     // =====================================================
     // LIST DIGITAL BOOKS
     // =====================================================
@@ -39,16 +38,16 @@ public class AdminBookController {
     public String listBooks(Model model) {
 
         List<DigitalBook> ebooks = digitalBookRepository.findAll();
-        Map<String, List<DigitalBook>> digitalGrouped = new LinkedHashMap<>();
+        Map<String, List<DigitalBook>> grouped = new LinkedHashMap<>();
 
-        for (DigitalBook eb : ebooks) {
-            digitalGrouped.computeIfAbsent(eb.getCategory(), k -> new ArrayList<>()).add(eb);
+        for (DigitalBook b : ebooks) {
+            String category = b.getCategory() == null ? "other" : b.getCategory();
+            grouped.computeIfAbsent(category, c -> new ArrayList<>()).add(b);
         }
 
-        model.addAttribute("digitalBooksGrouped", digitalGrouped);
+        model.addAttribute("digitalBooksGrouped", grouped);
         return "admin_books";
     }
-
 
     // =====================================================
     // VIEW PDF
@@ -57,10 +56,13 @@ public class AdminBookController {
     public ResponseEntity<Resource> openPdf(@PathVariable Long id) throws IOException {
 
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
-        if (ebook == null) return ResponseEntity.notFound().build();
+        if (ebook == null || ebook.getFileName() == null) {
+            return ResponseEntity.notFound().build();
+        }
 
+        String categoryFolder = ebook.getCategory().toLowerCase().trim();
         Path pdfPath = Paths.get("src/main/resources/static/books/" +
-                ebook.getCategory() + "/" + ebook.getFileName());
+                categoryFolder + "/" + ebook.getFileName());
 
         Resource resource = new UrlResource(pdfPath.toUri());
         if (!resource.exists()) return ResponseEntity.notFound().build();
@@ -69,7 +71,6 @@ public class AdminBookController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
-
 
     // =====================================================
     // DOWNLOAD PDF
@@ -78,29 +79,116 @@ public class AdminBookController {
     public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws MalformedURLException {
 
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
-        if (ebook == null) return ResponseEntity.notFound().build();
+        if (ebook == null || ebook.getFileName() == null) {
+            return ResponseEntity.notFound().build();
+        }
 
+        String categoryFolder = ebook.getCategory().toLowerCase().trim();
         Path pdfPath = Paths.get("src/main/resources/static/books/" +
-                ebook.getCategory() + "/" + ebook.getFileName());
+                categoryFolder + "/" + ebook.getFileName());
 
         Resource resource = new UrlResource(pdfPath.toUri());
         if (!resource.exists()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + ebook.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + ebook.getFileName() + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
 
+    // =====================================================
+    // ADD BOOK FORM
+    // =====================================================
+    @GetMapping("/add")
+    public String addBookForm(@RequestParam(required = false) String category, Model model) {
+
+        DigitalBook ebook = new DigitalBook();
+        if (category != null)
+            ebook.setCategory(category.toLowerCase().trim());
+
+        model.addAttribute("ebook", ebook);
+        return "book_form";  // ← FORMULAR MODERN
+    }
 
     // =====================================================
-    // DELETE + SAVE HISTORY
+    // SAVE NEW BOOK
     // =====================================================
-    @GetMapping("/delete/{id}")
-    public String deleteEbook(@PathVariable Long id) {
+    @PostMapping("/add")
+    public String addBook(@ModelAttribute DigitalBook ebook,
+                          @RequestParam("file") MultipartFile file) throws IOException {
+
+        if (file != null && !file.isEmpty()) {
+
+            String categoryFolder = ebook.getCategory().toLowerCase().trim();
+            String uploadDir = "src/main/resources/static/books/" + categoryFolder;
+
+            Files.createDirectories(Paths.get(uploadDir));
+
+            String cleanName = file.getOriginalFilename().replace(" ", "_");
+            Path filePath = Paths.get(uploadDir + "/" + cleanName);
+            Files.write(filePath, file.getBytes());
+
+            ebook.setFileName(cleanName);
+        }
+
+        digitalBookRepository.save(ebook);
+        return "redirect:/admin/books";
+    }
+
+    // =====================================================
+    // EDIT FORM
+    // =====================================================
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable Long id, Model model) {
 
         DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+        if (ebook == null) return "redirect:/admin/books";
 
+        model.addAttribute("ebook", ebook);
+        return "book_form"; // ← ACELAȘI FORMULAR MODERN
+    }
+
+    // =====================================================
+    // SAVE EDIT
+    // =====================================================
+    @PostMapping("/edit/{id}")
+    public String updateBook(@PathVariable Long id,
+                             @ModelAttribute DigitalBook updated,
+                             @RequestParam("file") MultipartFile file) throws IOException {
+
+        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
+        if (ebook == null) return "redirect:/admin/books";
+
+        ebook.setTitle(updated.getTitle());
+        ebook.setAuthor(updated.getAuthor());
+        ebook.setYear(updated.getYear());
+        ebook.setCategory(updated.getCategory().toLowerCase().trim());
+
+        if (file != null && !file.isEmpty()) {
+
+            String folder = "src/main/resources/static/books/" +
+                    ebook.getCategory().toLowerCase().trim();
+            Files.createDirectories(Paths.get(folder));
+
+            String cleanName = file.getOriginalFilename().replace(" ", "_");
+            Path filePath = Paths.get(folder + "/" + cleanName);
+            Files.write(filePath, file.getBytes());
+
+            ebook.setFileName(cleanName);
+        }
+
+        digitalBookRepository.save(ebook);
+        return "redirect:/admin/books";
+    }
+
+    // =====================================================
+    // DELETE + HISTORY
+    // =====================================================
+    @GetMapping("/delete/{id}")
+    public String deleteBook(@PathVariable Long id) {
+
+        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
         if (ebook != null) {
             historyRepository.save(new DigitalBookHistory(ebook, "DELETED"));
             digitalBookRepository.delete(ebook);
@@ -108,47 +196,6 @@ public class AdminBookController {
 
         return "redirect:/admin/books";
     }
-
-
-    // =====================================================
-    // EDIT FORM
-    // =====================================================
-    @GetMapping("/edit/{id}")
-    public String editEbookForm(@PathVariable Long id, Model model) {
-
-        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
-
-        if (ebook == null)
-            return "redirect:/admin/books";
-
-        model.addAttribute("ebook", ebook);
-        return "edit_ebook";
-    }
-
-
-    // =====================================================
-    // SAVE EDIT RESULT
-    // =====================================================
-    @PostMapping("/edit/{id}")
-    public String updateEbook(@PathVariable Long id,
-                              @ModelAttribute DigitalBook updated) {
-
-        DigitalBook ebook = digitalBookRepository.findById(id).orElse(null);
-
-        if (ebook != null) {
-
-            ebook.setTitle(updated.getTitle());
-            ebook.setAuthor(updated.getAuthor());
-            ebook.setYear(updated.getYear());
-            ebook.setCategory(updated.getCategory());
-            ebook.setFileName(updated.getFileName());
-
-            digitalBookRepository.save(ebook);
-        }
-
-        return "redirect:/admin/books";
-    }
-
 
     // =====================================================
     // HISTORY PAGE
@@ -159,7 +206,6 @@ public class AdminBookController {
         return "history_books";
     }
 
-
     // =====================================================
     // RESTORE BOOK
     // =====================================================
@@ -169,18 +215,16 @@ public class AdminBookController {
         DigitalBookHistory h = historyRepository.findById(historyId).orElse(null);
 
         if (h != null) {
+
             DigitalBook restored = new DigitalBook(
                     h.getTitle(),
                     h.getAuthor(),
                     h.getYear(),
-                    h.getCategory(),
+                    h.getCategory().toLowerCase().trim(),
                     h.getFileName()
             );
 
-            // salvăm cartea restaurată
             digitalBookRepository.save(restored);
-
-            // ștergem intrarea din istoric
             historyRepository.delete(h);
         }
 
@@ -188,12 +232,11 @@ public class AdminBookController {
     }
 
     // =====================================================
-    // CLEAR HISTORY (DELETE ALL)
+    // CLEAR HISTORY
     // =====================================================
     @GetMapping("/history/clear")
     public String clearHistory() {
         historyRepository.deleteAll();
         return "redirect:/admin/books/history";
     }
-
 }
