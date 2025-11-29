@@ -1,3 +1,4 @@
+//WebConfig.java
 package com.example.librarymanagementapp.config;
 
 import org.springframework.context.annotation.Configuration;

@@ -1,9 +1,7 @@
 package com.example.librarymanagementapp.controller;
 
-import com.example.librarymanagementapp.model.DigitalBook;
-import com.example.librarymanagementapp.model.DigitalBookHistory;
-import com.example.librarymanagementapp.repository.DigitalBookHistoryRepository;
-import com.example.librarymanagementapp.repository.DigitalBookRepository;
+import com.example.librarymanagementapp.model.*;
+import com.example.librarymanagementapp.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -31,26 +29,65 @@ public class AdminBookController {
     @Autowired
     private DigitalBookHistoryRepository historyRepository;
 
+    @Autowired
+    private PhysicalBookRepository physicalRepo;
+
+    @Autowired
+    private BorrowableBookRepository borrowableRepo;
+
+
     // =====================================================
-    // LIST DIGITAL BOOKS
+    // LIST ALL BOOK TYPES
     // =====================================================
     @GetMapping
     public String listBooks(Model model) {
 
+        /*
+         * DIGITAL BOOKS
+         */
         List<DigitalBook> ebooks = digitalBookRepository.findAll();
-        Map<String, List<DigitalBook>> grouped = new LinkedHashMap<>();
+        Map<String, List<DigitalBook>> groupedDigital = new LinkedHashMap<>();
 
         for (DigitalBook b : ebooks) {
             String category = b.getCategory() == null ? "other" : b.getCategory();
-            grouped.computeIfAbsent(category, c -> new ArrayList<>()).add(b);
+            groupedDigital.computeIfAbsent(category, c -> new ArrayList<>()).add(b);
         }
 
-        model.addAttribute("digitalBooksGrouped", grouped);
+
+        /*
+         * PHYSICAL BOOKS
+         */
+        var physical = physicalRepo.findAll();
+        Map<String, List<PhysicalBook>> groupedPhysical = new LinkedHashMap<>();
+
+        for (PhysicalBook p : physical) {
+            groupedPhysical.computeIfAbsent(p.getCategory(), c -> new ArrayList<>()).add(p);
+        }
+
+
+        /*
+         * BORROWABLE BOOKS
+         */
+        var borrowable = borrowableRepo.findAll();
+        Map<String, List<BorrowableBook>> groupedBorrow = new LinkedHashMap<>();
+
+        for (BorrowableBook b : borrowable) {
+            groupedBorrow.computeIfAbsent(b.getCategory(), c -> new ArrayList<>()).add(b);
+        }
+
+
+        // SEND EVERYTHING TO FRONTEND
+        model.addAttribute("digitalBooksGrouped", groupedDigital);
+        model.addAttribute("physicalBooks", groupedPhysical);
+        model.addAttribute("borrowableBooks", groupedBorrow);
+
         return "admin_books";
     }
 
+
+
     // =====================================================
-    // VIEW PDF
+    // VIEW PDF (Digital)
     // =====================================================
     @GetMapping("/open/{id}")
     public ResponseEntity<Resource> openPdf(@PathVariable Long id) throws IOException {
@@ -71,6 +108,8 @@ public class AdminBookController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
+
+
 
     // =====================================================
     // DOWNLOAD PDF
@@ -97,8 +136,10 @@ public class AdminBookController {
                 .body(resource);
     }
 
+
+
     // =====================================================
-    // ADD BOOK FORM
+    // ADD DIGITAL BOOK FORM
     // =====================================================
     @GetMapping("/add")
     public String addBookForm(@RequestParam(required = false) String category, Model model) {
@@ -108,11 +149,13 @@ public class AdminBookController {
             ebook.setCategory(category.toLowerCase().trim());
 
         model.addAttribute("ebook", ebook);
-        return "book_form";  // ← FORMULAR MODERN
+        return "book_form";
     }
 
+
+
     // =====================================================
-    // SAVE NEW BOOK
+    // SAVE NEW DIGITAL BOOK
     // =====================================================
     @PostMapping("/add")
     public String addBook(@ModelAttribute DigitalBook ebook,
@@ -136,8 +179,10 @@ public class AdminBookController {
         return "redirect:/admin/books";
     }
 
+
+
     // =====================================================
-    // EDIT FORM
+    // EDIT DIGITAL BOOK
     // =====================================================
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
@@ -146,11 +191,13 @@ public class AdminBookController {
         if (ebook == null) return "redirect:/admin/books";
 
         model.addAttribute("ebook", ebook);
-        return "book_form"; // ← ACELAȘI FORMULAR MODERN
+        return "book_form";
     }
 
+
+
     // =====================================================
-    // SAVE EDIT
+    // SAVE DIGITAL EDIT
     // =====================================================
     @PostMapping("/edit/{id}")
     public String updateBook(@PathVariable Long id,
@@ -182,8 +229,10 @@ public class AdminBookController {
         return "redirect:/admin/books";
     }
 
+
+
     // =====================================================
-    // DELETE + HISTORY
+    // DELETE DIGITAL BOOK
     // =====================================================
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
@@ -197,6 +246,8 @@ public class AdminBookController {
         return "redirect:/admin/books";
     }
 
+
+
     // =====================================================
     // HISTORY PAGE
     // =====================================================
@@ -206,8 +257,10 @@ public class AdminBookController {
         return "history_books";
     }
 
+
+
     // =====================================================
-    // RESTORE BOOK
+    // RESTORE DIGITAL BOOK
     // =====================================================
     @GetMapping("/restore/{historyId}")
     public String restoreBook(@PathVariable Long historyId) {
@@ -230,6 +283,8 @@ public class AdminBookController {
 
         return "redirect:/admin/books/history";
     }
+
+
 
     // =====================================================
     // CLEAR HISTORY

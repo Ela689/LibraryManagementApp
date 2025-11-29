@@ -1,11 +1,16 @@
 package com.example.librarymanagementapp.controller;
 
 import com.example.librarymanagementapp.model.BorrowableBook;
+import com.example.librarymanagementapp.model.BorrowableBookHistory;
 import com.example.librarymanagementapp.repository.BorrowableBookRepository;
+import com.example.librarymanagementapp.repository.BorrowableBookHistoryRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 @Controller
 @RequestMapping("/admin/borrowable")
@@ -14,22 +19,25 @@ public class AdminBorrowableBookController {
     @Autowired
     private BorrowableBookRepository borrowRepo;
 
+    @Autowired
+    private BorrowableBookHistoryRepository historyRepo;
+
     // ============================================
-    // LIST BOOKS GROUPED BY CATEGORY
+    // LIST GROUPED
     // ============================================
     @GetMapping
     public String listBorrowable(Model model) {
 
-        var books = borrowRepo.findAll();
+        List<BorrowableBook> books = borrowRepo.findAll();
 
-        var grouped = books.stream()
-                .collect(java.util.stream.Collectors.groupingBy(
-                        BorrowableBook::getCategory,
-                        java.util.LinkedHashMap::new,
-                        java.util.stream.Collectors.toList()
-                ));
+        Map<String, List<BorrowableBook>> grouped = new LinkedHashMap<>();
+        for (BorrowableBook b : books) {
+            grouped.computeIfAbsent(b.getCategory(), c -> new ArrayList<>()).add(b);
+        }
 
+        // 🔥 FIX: trimitem groupedBooks ca în celelalte pagini
         model.addAttribute("groupedBooks", grouped);
+
         return "admin_borrowable_books";
     }
 
@@ -37,11 +45,9 @@ public class AdminBorrowableBookController {
     // ADD FORM
     // ============================================
     @GetMapping("/add")
-    public String addBorrowForm(@RequestParam(required = false) String category,
-                                Model model) {
+    public String addForm(@RequestParam(required = false) String category, Model model) {
 
         BorrowableBook book = new BorrowableBook();
-
         if (category != null)
             book.setCategory(category);
 
@@ -50,16 +56,13 @@ public class AdminBorrowableBookController {
     }
 
     // ============================================
-    // SAVE NEW BOOK
+    // SAVE NEW
     // ============================================
     @PostMapping("/add")
     public String saveBorrowable(@ModelAttribute BorrowableBook book) {
 
-        if (book.getQuantity() <= 0)
-            book.setQuantity(20);
-
-        if (book.getBorrowed() < 0)
-            book.setBorrowed(0);
+        if (book.getQuantity() <= 0) book.setQuantity(20);
+        if (book.getBorrowed() < 0) book.setBorrowed(0);
 
         borrowRepo.save(book);
         return "redirect:/admin/borrowable";
@@ -100,12 +103,60 @@ public class AdminBorrowableBookController {
     }
 
     // ============================================
-    // DELETE
+    // DELETE → SAVE HISTORY
     // ============================================
     @GetMapping("/delete/{id}")
     public String deleteBorrowable(@PathVariable Long id) {
 
-        borrowRepo.deleteById(id);
+        BorrowableBook book = borrowRepo.findById(id).orElse(null);
+        if (book != null) {
+            historyRepo.save(new BorrowableBookHistory(book, "DELETED"));
+            borrowRepo.delete(book);
+        }
+
         return "redirect:/admin/borrowable";
+    }
+
+    // ============================================
+    // HISTORY PAGE
+    // ============================================
+    @GetMapping("/history")
+    public String borrowableHistory(Model model) {
+        model.addAttribute("history", historyRepo.findAll());
+        return "history_borrowable_books";
+    }
+
+    // ============================================
+    // RESTORE BOOK
+    // ============================================
+    @GetMapping("/restore/{historyId}")
+    public String restoreBorrowable(@PathVariable Long historyId) {
+
+        BorrowableBookHistory h = historyRepo.findById(historyId).orElse(null);
+
+        if (h != null) {
+            BorrowableBook restored = new BorrowableBook(
+                    h.getTitle(),
+                    h.getAuthor(),
+                    h.getYear(),
+                    h.getCategory(),
+                    h.getQuantity(),
+                    h.getBorrowed()
+            );
+
+            borrowRepo.save(restored);
+            historyRepo.delete(h);
+        }
+
+        return "redirect:/admin/borrowable/history";
+    }
+
+    // ============================================
+    // CLEAR HISTORY
+    // ============================================
+    @GetMapping("/history/clear")
+    public String clearHistory() {
+        historyRepo.deleteAll();
+        return "redirect:/admin/borrowable/history";
     }
 }

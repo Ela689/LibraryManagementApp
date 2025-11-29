@@ -1,3 +1,4 @@
+//BoookDataSeeder.java
 package com.example.librarymanagementapp.config;
 
 // ❗ Seeder dezactivat complet pentru a evita inserările automate
