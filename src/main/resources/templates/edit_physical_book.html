@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Physical Book</title>
+
+    <style>
+        body { background:#f1f3f6; font-family:Arial; }
+        .box {
+            width:450px; margin:50px auto; background:white;
+            padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width:100%; padding:10px; margin:10px 0;
+            border-radius:5px; border:1px solid #ccc;
+        }
+        button {
+            width:100%; padding:12px; background:#ffa502;
+            border:none; color:white; font-size:16px; border-radius:6px; cursor:pointer;
+        }
+        a { display:block; margin-top:10px; text-align:center; color:#555; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+
+    <h2>Edit Physical Book</h2>
+
+    <form th:action="@{'/admin/physical/edit/' + ${book.id}}" th:object="${book}" method="post">
+
+        <input type="text" th:field="*{title}">
+        <input type="text" th:field="*{author}">
+        <input type="number" th:field="*{year}">
+        <input type="text" th:field="*{category}">
+        <input type="number" th:field="*{quantity}">
+
+        <button type="submit">Save Changes</button>
+
+        <a href="/admin/physical">Back</a>
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrowable Library Books – Admin Panel</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body { font-family: Arial, sans-serif; background:#f5f7fb; margin:0; }
+        .header {
+            background:white; padding:20px 40px;
+            border-bottom:2px solid #dfe4ea;
+            display:flex;justify-content:space-between;align-items:center;
+        }
+        h1 { color:#005eff; font-size:28px; margin:0; }
+        .section-container { width:80%; margin:30px auto; }
+        .section-box {
+            background:white; padding:20px 25px; border-radius:10px;
+            margin-bottom:30px; border-left:6px solid #007bff;
+        }
+        details { background:#f1f3f6; padding:10px; border-radius:6px; margin-bottom:10px; }
+        summary { font-size:18px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between; }
+        .book-item { padding:8px 0 8px 15px; }
+        .btn {
+            padding:4px 10px; background:#007bff; color:white;
+            border-radius:5px; font-size:12px; text-decoration:none; margin-left:10px;
+        }
+        .btn-edit { background:#ffa502; }
+        .btn-delete { background:#ff4757; }
+        .btn-add { background:#0c76ff; }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1><i class="fa-solid fa-handshake"></i> Borrowable Library Books</h1>
+
+    <a href="/admin/borrowable/add" class="btn btn-add">
+        <i class="fa-solid fa-plus"></i> Add New Book
+    </a>
+</div>
+
+<div class="section-container">
+
+    <div th:each="category : ${groupedBooks}" class="section-box">
+        <details>
+            <summary>
+                <span th:text="${category.key}"></span>
+
+                <a th:href="@{'/admin/borrowable/add?category=' + ${category.key}}" class="btn btn-add">
+                    <i class="fa-solid fa-plus"></i> Add Book
+                </a>
+            </summary>
+
+            <div th:each="b : ${category.value}" class="book-item">
+
+                <span th:text="${b.title + ' - ' + b.author + ' (' + b.year + ')'}"></span>
+
+                <span style="color:#555;"> | Qty: </span>
+                <span th:text="${b.quantity}"></span>
+
+                <span style="color:#555;"> | Borrowed: </span>
+                <span th:text="${b.borrowed}"></span>
+
+                <a th:href="@{'/admin/borrowable/edit/' + ${b.id}}" class="btn btn-edit">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </a>
+
+                <a th:href="@{'/admin/borrowable/delete/' + ${b.id}}" class="btn btn-delete">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </a>
+
+            </div>
+        </details>
+    </div>
+
+</div>
+
+</body>
+</html>
