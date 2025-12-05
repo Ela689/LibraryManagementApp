@@ -2,6 +2,7 @@ package com.example.librarymanagementapp.controller;
 
 import com.example.librarymanagementapp.model.User;
 import com.example.librarymanagementapp.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +17,17 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    // HOME ADMIN PANEL (Main menu)
+    @GetMapping("/home")
+    public String adminHome() {
+        return "admin_books";   // pagina Manage Books + meniurile
+    }
+
+
+    // USER LIST PAGE
     @GetMapping("/users")
     public String listUsers(Model model) {
+
         List<User> users = userRepository.findAll();
 
         List<User> adminUsers = users.stream()

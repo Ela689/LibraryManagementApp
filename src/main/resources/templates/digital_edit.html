@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Digital Book</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background: #f0f5ff;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+        }
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 6px solid #0069ff;
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #0069ff;
+        }
+        .btn-submit {
+            background: #0069ff;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-submit:hover {
+            background: #0055d4;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-card shadow">
+
+    <h2 class="form-title mb-3">
+        <i class="fa-solid fa-pen"></i> Edit Digital Book
+    </h2>
+
+    <form th:action="@{'/admin/digital/edit/' + ${ebook.id}}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Title</label>
+            <input type="text" class="form-control" required name="title" th:value="${ebook.title}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Author</label>
+            <input type="text" class="form-control" required name="author" th:value="${ebook.author}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Year</label>
+            <input type="number" class="form-control" required name="year" th:value="${ebook.year}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Category</label>
+            <input type="text" class="form-control" required name="category" th:value="${ebook.category}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Replace PDF (optional)</label>
+            <input type="file" class="form-control" name="file" accept=".pdf">
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a href="/admin/digital" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+
+            <button class="btn btn-submit">
+                <i class="fa-solid fa-save"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

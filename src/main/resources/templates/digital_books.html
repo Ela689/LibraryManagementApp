@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Books</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background:#f0f5ff;
+            padding:40px;
+            font-family: Arial, sans-serif;
+        }
+
+        .cat-box {
+            border-left:6px solid #0069ff;
+            border-radius:10px;
+            background:white;
+            margin-bottom:25px;
+        }
+
+        .cat-header {
+            padding:18px 25px;
+            font-size:20px;
+            font-weight:bold;
+            cursor:pointer;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            color:#0040cc;
+        }
+
+        .cat-header:hover { background:#e6f0ff; }
+
+        .add-btn {
+            background:#0069ff;
+            color:white;
+            padding:7px 14px;
+            border-radius:6px;
+            text-decoration:none;
+        }
+
+        .book-row {
+            display:flex;
+            justify-content:space-between;
+            padding:10px 5px;
+            border-bottom:1px solid #eee;
+        }
+
+        .book-row:last-child { border-bottom:none; }
+
+        .actions { display:flex; gap:8px; }
+
+        .search-box {
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+
+        .pdf-btn {
+            background:#00b7ff;
+            border:none;
+        }
+
+        .pdf-btn:hover {
+            background:#0099dd;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between mb-4">
+    <h2 class="fw-bold" style="color:#0069ff;">
+        <i class="fa-solid fa-tablet-screen-button"></i> Digital Books
+    </h2>
+
+    <div class="d-flex gap-3">
+        <a href="/admin/books" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Library Admin Panel
+        </a>
+
+        <a href="/admin/digital/history" class="btn btn-primary">
+            <i class="fa-solid fa-clock-rotate-left"></i> History
+        </a>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-box">
+    <input id="searchInput" type="text" class="form-control" placeholder="Search books..."
+           onkeyup="searchBooks()">
+</div>
+
+<!-- ========================= CATEGORIES =========================== -->
+
+<div th:each="entry, iter : ${grouped}">
+
+    <div class="cat-box">
+
+        <!-- CATEGORY HEADER -->
+        <div class="cat-header"
+             data-bs-toggle="collapse"
+             th:data-bs-target="'#cat' + ${iter.index}">
+
+            <span th:text="${entry.key}"></span>
+            <i class="fa-solid fa-chevron-down"></i>
+
+        </div>
+
+        <!-- COLLAPSED CONTENT -->
+        <div class="collapse"
+             th:id="'cat' + ${iter.index}">
+
+            <!-- FILTERS + ADD BUTTON -->
+            <div class="d-flex justify-content-between mt-3 px-4">
+
+                <select class="form-select w-auto"
+                        th:onchange="'sortCategory(\'body' + ${iter.index} + '\', this.value)'">
+                    <option value="">Sort by...</option>
+                    <option value="title">Title A–Z</option>
+                    <option value="author">Author A–Z</option>
+                    <option value="yearAsc">Year ↑</option>
+                    <option value="yearDesc">Year ↓</option>
+                </select>
+
+                <a th:href="@{'/admin/digital/add?category=' + ${entry.key}}" class="add-btn">
+                    <i class="fa-solid fa-plus"></i> Add Book
+                </a>
+            </div>
+
+            <!-- BOOKS LIST -->
+            <div class="mt-3 px-4 pb-3"
+                 th:id="'body' + ${iter.index}">
+
+                <div class="book-row"
+                     th:each="book : ${entry.value}"
+                     th:data-title="${book.title}"
+                     th:data-author="${book.author}"
+                     th:data-year="${book.year}">
+
+                    <!-- Book Info -->
+                    <div>
+                        <b th:text="${book.title}"></b>
+                        – <span th:text="${book.author}"></span>
+                        (<span th:text="${book.year}"></span>)
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="actions">
+
+                        <a th:href="@{'/admin/digital/open/' + ${book.id}}"
+                           target="_blank"
+                           class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-eye"></i> View
+                        </a>
+
+                        <a th:href="@{'/admin/digital/download/' + ${book.id}}"
+                           class="btn pdf-btn btn-sm text-white">
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </a>
+
+                        <a th:href="@{'/admin/digital/edit/' + ${book.id}}"
+                           class="btn btn-warning btn-sm">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </a>
+
+                        <a th:href="@{'/admin/digital/delete/' + ${book.id}}"
+                           onclick="return confirmDelete()"
+                           class="btn btn-danger btn-sm">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===================== JAVASCRIPT =========================== -->
+
+<script>
+
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this digital book?");
+    }
+
+    // SEARCH
+    function searchBooks() {
+        let term = document.getElementById("searchInput").value.toLowerCase();
+
+        document.querySelectorAll(".cat-box").forEach(cat => {
+
+            let rows = cat.querySelectorAll(".book-row");
+            let visible = false;
+
+            rows.forEach(r => {
+                let text = r.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    r.style.display = "flex";
+                    visible = true;
+                } else {
+                    r.style.display = "none";
+                }
+            });
+
+            // Show or hide category
+            cat.style.display = visible ? "" : "none";
+        });
+    }
+
+    // SORTING
+    function sortCategory(id, mode) {
+        let container = document.getElementById(id);
+        let rows = Array.from(container.querySelectorAll(".book-row"));
+
+        rows.sort((a, b) => {
+
+            switch (mode) {
+                case "title":
+                    return a.dataset.title.localeCompare(b.dataset.title);
+
+                case "author":
+                    return a.dataset.author.localeCompare(b.dataset.author);
+
+                case "yearAsc":
+                    return Number(a.dataset.year) - Number(b.dataset.year);
+
+                case "yearDesc":
+                    return Number(b.dataset.year) - Number(a.dataset.year);
+            }
+        });
+
+        rows.forEach(r => container.appendChild(r));
+    }
+
+</script>
+
+</body>
+</html>
