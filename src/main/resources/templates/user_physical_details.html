@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Details</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <style>
+        body { background:#eef2f7; }
+        .card {
+            border-radius:14px;
+            padding:25px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        }
+        .label { font-weight:600; }
+    </style>
+</head>
+
+<body class="p-4">
+
+<div class="card mx-auto" style="max-width:650px;">
+
+    <h3 class="text-center text-primary mb-3"
+        th:text="${book.title}">Title</h3>
+
+    <h5 class="text-center mb-4"
+        th:text="${book.author}">Author</h5>
+
+    <div class="mb-2">
+        <span class="label">Category:</span>
+        <span th:text="${book.category}"></span>
+    </div>
+
+    <div class="mb-2">
+        <span class="label">Published Year:</span>
+        <span th:text="${book.year}"></span>
+    </div>
+
+    <div class="mb-2">
+        <span class="label">Available:</span>
+        <span th:text="${book.quantity}"></span>
+    </div>
+
+    <div class="mb-2">
+        <span class="label">ISBN:</span>
+        <span th:text="'978-100000' + ${book.id}"></span>
+    </div>
+
+    <div class="mb-2">
+        <span class="label">Edition:</span>
+        <span th:switch="${book.id % 5}">
+            <span th:case="0">First Edition</span>
+            <span th:case="1">Second Edition</span>
+            <span th:case="2">Revised Edition</span>
+            <span th:case="3">Collector’s Edition</span>
+            <span th:case="4">Limited Edition</span>
+        </span>
+    </div>
+
+    <div class="mb-2">
+        <span class="label">Pages:</span>
+        <span th:text="${150 + (book.id * 17) % 450}"></span>
+    </div>
+
+    <div class="mb-3">
+        <span class="label">Publisher:</span>
+        <span th:switch="${book.id % 6}">
+            <span th:case="0">Classic Publishing House</span>
+            <span th:case="1">Oxford Press</span>
+            <span th:case="2">Penguin Random House</span>
+            <span th:case="3">Vintage Books</span>
+            <span th:case="4">Academic Press</span>
+            <span th:case="5">Global Library Editions</span>
+        </span>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <a href="/user/books/physical"
+           class="btn btn-secondary">
+            ← Back to list
+        </a>
+
+        <a href="/user/home"
+           class="btn btn-outline-secondary">
+            🏠 Home
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

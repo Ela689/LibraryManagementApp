@@ -12,24 +12,24 @@ public class BorrowableBook {
 
     private String title;
     private String author;
-    private int year;
+    private Integer year;
     private String category;
+    private Integer quantity;
+    private Integer borrowed;
 
-    private int quantity;   // total exemplare
-    private int borrowed;   // câte sunt împrumutate
+    // METADATA EXTINSĂ
+    private String collection;
+    private String cover_type;
+    private String edition;
+    private String format;
+    private String isbn;
+    private Integer pages;
+    private String publisher;
+    private Integer release_year;
+    private String translator;
 
-    public BorrowableBook() {}
+    // GETTERS & SETTERS BELOW
 
-    public BorrowableBook(String title, String author, int year, String category, int quantity, int borrowed) {
-        this.title = title;
-        this.author = author;
-        this.year = year;
-        this.category = category;
-        this.quantity = quantity;
-        this.borrowed = borrowed;
-    }
-
-    // GETTERS & SETTERS
     public Long getId() { return id; }
 
     public String getTitle() { return title; }
@@ -38,15 +38,42 @@ public class BorrowableBook {
     public String getAuthor() { return author; }
     public void setAuthor(String author) { this.author = author; }
 
-    public int getYear() { return year; }
-    public void setYear(int year) { this.year = year; }
+    public Integer getYear() { return year; }
+    public void setYear(Integer year) { this.year = year; }
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public int getBorrowed() { return borrowed; }
-    public void setBorrowed(int borrowed) { this.borrowed = borrowed; }
+    public Integer getBorrowed() { return borrowed; }
+    public void setBorrowed(Integer borrowed) { this.borrowed = borrowed; }
+
+    public String getCollection() { return collection; }
+    public void setCollection(String collection) { this.collection = collection; }
+
+    public String getCover_type() { return cover_type; }
+    public void setCover_type(String cover_type) { this.cover_type = cover_type; }
+
+    public String getEdition() { return edition; }
+    public void setEdition(String edition) { this.edition = edition; }
+
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public Integer getPages() { return pages; }
+    public void setPages(Integer pages) { this.pages = pages; }
+
+    public String getPublisher() { return publisher; }
+    public void setPublisher(String publisher) { this.publisher = publisher; }
+
+    public Integer getRelease_year() { return release_year; }
+    public void setRelease_year(Integer release_year) { this.release_year = release_year; }
+
+    public String getTranslator() { return translator; }
+    public void setTranslator(String translator) { this.translator = translator; }
 }

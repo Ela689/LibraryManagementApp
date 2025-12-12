@@ -18,6 +18,7 @@ public class UserController {
     @GetMapping("/user_wait")
     public String userWait(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         if (auth == null || !auth.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -26,6 +27,27 @@ public class UserController {
         User user = userRepository.findByUsername(username);
         model.addAttribute("user", user);
 
+        // Dacă userul este activ → redirecționăm către user dashboard
+        if (user.isActive()) {
+            return "redirect:/user/home";
+        }
+
         return "user_wait";
     }
+
+    @GetMapping("/user/home")
+    public String userHome(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        String username = auth.getName();
+        User user = userRepository.findByUsername(username);
+        model.addAttribute("user", user);
+
+        return "user_home";
+    }
+
 }

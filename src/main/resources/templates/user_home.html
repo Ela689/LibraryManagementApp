@@ -3,98 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f5f7fa;
-            margin: 0;
-            padding: 0;
+            background:#eef3f9;
+            padding:40px;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        header {
-            background: #004080;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: 22px;
-            font-weight: 600;
+        .page-title {
+            color:#0057d8;
+            font-weight:700;
+            font-size:32px;
+            margin-bottom:40px;
         }
 
-        .container {
-            text-align: center;
-            margin-top: 80px;
+        .menu-box {
+            background:white;
+            padding:35px;
+            border-radius:18px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            transition: .25s;
+            cursor:pointer;
+            border-left:10px solid #0057d8;
+            text-align:center;
         }
 
-        .card {
-            background: white;
-            width: 400px;
-            margin: auto;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .menu-box:hover {
+            transform: translateY(-6px);
+            box-shadow:0 8px 20px rgba(0,0,0,0.15);
         }
 
-        .card h3 {
-            color: #004080;
-            margin-bottom: 10px;
+        .menu-icon {
+            font-size:48px;
+            margin-bottom:15px;
+            color:#0057d8;
         }
 
-        .card p {
-            color: #333;
-            margin-bottom: 25px;
-        }
-
-        button {
-            background-color: #004080;
-            border: none;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin: 8px;
-        }
-
-        button:hover {
-            background-color: #0055cc;
-        }
-
-        .logout {
-            background-color: #dc3545;
-        }
-
-        .logout:hover {
-            background-color: #c82333;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 80px;
-            color: #777;
-            font-size: 14px;
+        .logout-btn {
+            margin-top:50px;
         }
     </style>
 </head>
+
 <body>
 
-<header>Library Management App</header>
-
 <div class="container">
-    <div class="card">
-        <h3 th:text="'Welcome, ' + ${user.username} + ' (USER)'"></h3>
-        <p>Your personal library dashboard</p>
 
-        <div>
-            <a href="/books"><button>View Available Books</button></a>
-            <a href="/borrowed"><button>My Borrowed Books</button></a>
-            <a href="/logout"><button class="logout">Logout</button></a>
+    <h2 class="page-title">
+        <i class="fa-solid fa-user"></i>
+        Welcome, <span th:text="${user.username}"></span>
+    </h2>
+
+    <div class="row g-4">
+
+        <!-- View Physical Books -->
+        <div class="col-md-4">
+            <a href="/user/books/physical" style="text-decoration:none;">
+                <div class="menu-box">
+                    <i class="fa-solid fa-book menu-icon"></i>
+                    <h4>Physical Books</h4>
+                </div>
+            </a>
         </div>
-    </div>
-</div>
 
-<footer>
-    © 2025 Library Management App | Java Project - Daniela Pavlenco
-</footer>
+        <!-- Borrowable Books -->
+        <div class="col-md-4">
+            <a href="/user/books/borrowable" style="text-decoration:none;">
+                <div class="menu-box" style="border-left-color:#f1c40f;">
+                    <i class="fa-solid fa-book-bookmark menu-icon" style="color:#f1c40f;"></i>
+                    <h4>Borrowable Books</h4>
+                </div>
+            </a>
+        </div>
+
+        <!-- Digital Books -->
+        <div class="col-md-4">
+            <a href="/user/books/digital" style="text-decoration:none;">
+                <div class="menu-box" style="border-left-color:#007bff;">
+                    <i class="fa-solid fa-tablet-screen-button menu-icon" style="color:#007bff;"></i>
+                    <h4>Digital Books</h4>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- LOGOUT -->
+    <form method="post" action="/logout" class="text-center logout-btn">
+        <button class="btn btn-danger px-4">Logout</button>
+    </form>
+
+</div>
 
 </body>
 </html>

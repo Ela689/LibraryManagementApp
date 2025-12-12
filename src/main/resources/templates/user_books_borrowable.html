@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrowable Books</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background: #eef3f9;
+            padding: 40px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Search + Filter Section */
+        .filter-box {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .category-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px 25px;
+            margin-bottom: 20px;
+            border-left: 8px solid #0057d8;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .category-title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 22px;
+            font-weight: 700;
+            color: #0057d8;
+        }
+
+        .book-row {
+            padding: 12px 5px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-btn {
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .borrow-btn {
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        .borrow-btn:disabled {
+            background: grey;
+        }
+
+        /* HISTORY BOX – Modern look */
+        #historyToggle {
+            position: fixed;
+            top: 20px;
+            right: 25px;
+            background: #007bff;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 999;
+        }
+
+        #historyBox {
+            position: fixed;
+            top: 70px;
+            right: 25px;
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 14px;
+            padding: 15px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            display: none;
+            z-index: 999;
+        }
+
+        #historyList a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #0057d8;
+        }
+
+        #historyList a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2 class="text-primary mb-4">
+    <i class="fa-solid fa-book-bookmark"></i> Borrowable Books
+</h2>
+
+<!-- ============================ -->
+<!-- SEARCH + FILTERS -->
+<!-- ============================ -->
+<div class="filter-box">
+
+    <div class="row g-3">
+
+        <!-- SEARCH -->
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by title, author...">
+        </div>
+
+        <!-- CATEGORY FILTER -->
+        <div class="col-md-3">
+            <select id="categoryFilter" class="form-select">
+                <option value="">All Categories</option>
+                <option th:each="entry : ${groupedBooks}" th:text="${entry.key}" th:value="${entry.key}"></option>
+            </select>
+        </div>
+
+        <!-- AVAILABILITY FILTER -->
+        <div class="col-md-3">
+            <select id="availabilityFilter" class="form-select">
+                <option value="">Availability</option>
+                <option value="available">Available only</option>
+                <option value="unavailable">Unavailable</option>
+            </select>
+        </div>
+
+    </div>
+</div>
+
+<!-- HISTORY BUTTON -->
+<div id="historyToggle">
+    <i class="fa-solid fa-clock-rotate-left"></i> History
+</div>
+
+<!-- FLOATING HISTORY PANEL -->
+<div id="historyBox">
+    <h5><i class="fa-solid fa-clock-rotate-left"></i> Recent Views</h5>
+    <ul id="historyList" class="list-group mb-3"></ul>
+    <button class="btn btn-danger btn-sm w-100" onclick="clearHistory()">Clear History</button>
+</div>
+
+
+<!-- ============================ -->
+<!-- CATEGORY SECTIONS -->
+<!-- ============================ -->
+<div class="container">
+
+    <div th:each="entry, iter : ${groupedBooks}" th:fragment="categoryGroup">
+
+        <div class="category-box"
+             data-bs-toggle="collapse"
+             th:data-bs-target="'#cat' + ${iter.index}">
+            <div class="category-title">
+                <span class="category-name" th:text="${entry.key}"></span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="collapse" th:id="'cat' + ${iter.index}">
+            <div class="bg-white p-3 rounded">
+
+                <div class="book-row"
+                     th:each="b : ${entry.value}"
+                     th:id="'book-' + ${b.id}"
+                     th:data-title="${b.title}"
+                     th:data-author="${b.author}"
+                     th:data-category="${b.category}"
+                     th:data-available="${(b.quantity - b.borrowed) > 0}">
+
+                    <div>
+                        <b th:text="${b.title}"></b> –
+                        <span th:text="${b.author}"></span>
+                        (<span th:text="${b.year}"></span>)
+                    </div>
+
+                    <div class="d-flex">
+                        <form th:action="@{'/user/books/borrow/' + ${b.id}}" method="post">
+                            <button class="borrow-btn"
+                                    th:disabled="${(b.quantity - b.borrowed) <= 0}">Borrow</button>
+                        </form>
+
+                        <a th:href="@{'/user/books/details/' + ${b.id}}"
+                           class="details-btn"
+                           th:data-title="${b.title}"
+                           th:onclick="|saveHistory(${b.id}, this.dataset.title)|">
+                            Details
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <a href="/user/home" class="btn btn-secondary mt-4">← Back</a>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    /* =======================================================
+       SEARCH + FILTERS COMBINED
+    ======================================================= */
+    function applyFilters() {
+        let text = document.getElementById("searchInput").value.toLowerCase();
+        let category = document.getElementById("categoryFilter").value;
+        let availability = document.getElementById("availabilityFilter").value;
+
+        document.querySelectorAll(".book-row").forEach(row => {
+            const title = row.dataset.title.toLowerCase();
+            const author = row.dataset.author.toLowerCase();
+            const rowCategory = row.dataset.category;
+            const isAvailable = row.dataset.available === "true";
+
+            let match =
+                (title.includes(text) || author.includes(text)) &&
+                (category === "" || category === rowCategory) &&
+                (availability === "" ||
+                    (availability === "available" && isAvailable) ||
+                    (availability === "unavailable" && !isAvailable));
+
+            row.style.display = match ? "" : "none";
+        });
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", applyFilters);
+    document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+    document.getElementById("availabilityFilter").addEventListener("change", applyFilters);
+
+
+    /* =======================================================
+       HISTORY SYSTEM
+    ======================================================= */
+    function saveHistory(id, title) {
+        let list = JSON.parse(localStorage.getItem("bookHistory") || "[]");
+
+        list = list.filter(item => item.id !== id); // remove duplicates
+        list.unshift({id, title});                  // add new first
+
+        if (list.length > 10) list.pop();           // limit size
+
+        localStorage.setItem("bookHistory", JSON.stringify(list));
+    }
+
+    function loadHistory() {
+        let list = JSON.parse(localStorage.getItem("bookHistory") || "[]");
+        let box = document.getElementById("historyList");
+
+        box.innerHTML = "";
+
+        list.forEach(item => {
+            let li = document.createElement("li");
+            li.classList.add("list-group-item");
+
+            li.innerHTML =
+                `<i class="fa-solid fa-book-open me-2 text-primary"></i>
+             <a href="/user/books/details/${item.id}">${item.title}</a>`;
+
+            box.appendChild(li);
+        });
+    }
+
+    function clearHistory() {
+        localStorage.removeItem("bookHistory");
+        loadHistory();
+    }
+
+    document.getElementById("historyToggle").onclick = () => {
+        let box = document.getElementById("historyBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+        loadHistory();
+    };
+
+</script>
+
+</body>
+</html>

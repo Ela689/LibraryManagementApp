@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Book Details</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background: #eef3f9;
+            padding: 50px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .details-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            max-width: 750px;
+            margin: auto;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #0057d8;
+            margin-bottom: 10px;
+        }
+
+        .author {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+
+        .info-label {
+            font-weight: 600;
+        }
+
+        .btn-borrow {
+            background: #27ae60;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            border: none;
+            font-size: 18px;
+            transition: .2s;
+        }
+
+        .btn-borrow:hover {
+            background: #1e8a4c;
+        }
+
+        .btn-back {
+            background: #7f8c8d;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="details-card">
+
+    <div class="text-center">
+        <h2 class="title" th:text="${book.title}"></h2>
+        <div class="author">
+            <i class="fa-solid fa-feather"></i>
+            <span th:text="${book.author}"></span>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- BOOK DETAILS LIST -->
+    <div class="info-row">
+        <span class="info-label">Category:</span>
+        <span th:text="${book.category}"></span>
+    </div>
+
+    <div class="info-row">
+        <span class="info-label">Published Year:</span>
+        <span th:text="${book.year}"></span>
+    </div>
+
+    <div class="info-row">
+        <span class="info-label">Available:</span>
+        <span th:text="${book.quantity - book.borrowed}"></span>
+    </div>
+
+    <!-- Optional extended metadata - add if exists -->
+    <div class="info-row">
+        <span class="info-label">ISBN:</span>
+        <span th:text="${book.isbn != null ? book.isbn : '—'}"></span>
+    </div>
+
+    <div class="info-row">
+        <span class="info-label">Edition:</span>
+        <span th:text="${book.edition != null ? book.edition : '—'}"></span>
+    </div>
+
+    <div class="info-row">
+        <span class="info-label">Pages:</span>
+        <span th:text="${book.pages != null ? book.pages : '—'}"></span>
+    </div>
+
+    <div class="info-row">
+        <span class="info-label">Publisher:</span>
+        <span th:text="${book.publisher != null ? book.publisher : '—'}"></span>
+    </div>
+
+
+    <div class="d-flex justify-content-between mt-4">
+
+        <!-- Borrow Button -->
+        <form th:action="@{'/user/borrow/' + ${book.id}}" method="post">
+            <button class="btn-borrow"
+                    th:disabled="${(book.quantity - book.borrowed) <= 0}">
+                Borrow Book
+            </button>
+        </form>
+
+        <!-- Back Button -->
+        <a href="/user/books/borrowable" class="btn-back">← Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>

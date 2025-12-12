@@ -129,27 +129,46 @@ public class AdminBorrowableBookController {
     // ============================================
     // RESTORE BOOK
     // ============================================
+// ============================================
+// RESTORE BOOK (VERSIONA CORECTĂ PENTRU NOILE CÂMPURI)
+// ============================================
     @GetMapping("/restore/{historyId}")
     public String restoreBorrowable(@PathVariable Long historyId) {
 
         BorrowableBookHistory h = historyRepo.findById(historyId).orElse(null);
 
         if (h != null) {
-            BorrowableBook restored = new BorrowableBook(
-                    h.getTitle(),
-                    h.getAuthor(),
-                    h.getYear(),
-                    h.getCategory(),
-                    h.getQuantity(),
-                    h.getBorrowed()
-            );
+
+            BorrowableBook restored = new BorrowableBook();
+
+            // ---- câmpurile originale ----
+            restored.setTitle(h.getTitle());
+            restored.setAuthor(h.getAuthor());
+            restored.setYear(h.getYear());
+            restored.setCategory(h.getCategory());
+            restored.setQuantity(h.getQuantity());
+            restored.setBorrowed(h.getBorrowed());
+
+            // ---- câmpurile noi adăugate în DB ----
+            restored.setCollection(h.getCollection());
+            restored.setCover_type(h.getCover_type());
+            restored.setEdition(h.getEdition());
+            restored.setFormat(h.getFormat());
+            restored.setIsbn(h.getIsbn());
+            restored.setPages(h.getPages());
+            restored.setPublisher(h.getPublisher());
+            restored.setRelease_year(h.getRelease_year());
+            restored.setTranslator(h.getTranslator());
 
             borrowRepo.save(restored);
+
+            // ștergem intrarea din istoric
             historyRepo.delete(h);
         }
 
         return "redirect:/admin/borrowable/history";
     }
+
 
     // ============================================
     // CLEAR HISTORY

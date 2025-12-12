@@ -20,7 +20,7 @@ public class AdminController {
     // HOME ADMIN PANEL (Main menu)
     @GetMapping("/home")
     public String adminHome() {
-        return "admin_books";   // pagina Manage Books + meniurile
+        return "admin_home";   // pagina Manage Books + meniurile
     }
 
 

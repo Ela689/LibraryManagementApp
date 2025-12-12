@@ -3,82 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <title>Manage Users</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        body { background-color: #f4f6f9; }
-        h3 { text-align: center; color: #0d3b66; margin-top: 30px; }
-        table { margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; }
-        th { background: #0d3b66; color: white; text-align: center; }
-        td { text-align: center; vertical-align: middle; }
-        .btn { margin: 2px; }
+        body {
+            background-color: #eef3f9;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-size: 34px;
+            font-weight: 700;
+            color: #0047b3;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .card-box {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .table thead {
+            background-color: #0047b3;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f0f6ff;
+        }
+
+        .btn-action {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .btn-view { background:#0b5ed7; color:white; }
+        .btn-view:hover { background:#084298; }
+
+        .btn-deactivate { background:#f1c40f; color:#000; }
+        .btn-deactivate:hover { background:#d4ac0d; }
+
+        .btn-delete { background:#e74c3c; color:white; }
+        .btn-delete:hover { background:#c0392b; }
+
+        .back-btn {
+            background:#5a6268;
+            color:white;
+            padding:10px 20px;
+            border-radius:6px;
+            text-decoration:none;
+        }
+        .back-btn:hover { background:#42484d; }
     </style>
 </head>
+
 <body>
+
+<h1 class="page-title">
+    <i class="fa-solid fa-users-gear me-2"></i>Manage Users
+</h1>
+
 <div class="container">
-    <h3>👑 Admin Accounts</h3>
-    <table class="table table-bordered" th:if="${adminUsers != null and !adminUsers.isEmpty()}">
-        <thead>
-        <tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Active</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="admin : ${adminUsers}">
-            <td th:text="${admin.id}"></td>
-            <td th:text="${admin.username}"></td>
-            <td th:text="${admin.email}"></td>
-            <td th:text="${admin.role}"></td>
-            <td th:text="${admin.active}"></td>
-        </tr>
-        </tbody>
-    </table>
 
-    <h3>👥 User Accounts</h3>
-    <table class="table table-bordered" th:if="${normalUsers != null and !normalUsers.isEmpty()}">
-        <thead>
-        <tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Active</th><th>Actions</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${normalUsers}">
-            <td th:text="${user.id}"></td>
-            <td th:text="${user.username}"></td>
-            <td th:text="${user.email}"></td>
-            <td th:text="${user.role}"></td>
-            <td th:text="${user.active}"></td>
-            <td>
-                <a th:href="@{'/admin/users/view/' + ${user.id}}" class="btn btn-primary btn-sm">View</a>
+    <!-- ==================== ADMIN ACCOUNTS ==================== -->
+    <div class="card-box">
+        <h4 class="mb-3">
+            <i class="fa-solid fa-crown text-warning me-2"></i>
+            Admin Accounts
+        </h4>
 
-                <button class="btn btn-warning btn-sm"
-                        th:text="${user.active} ? 'Deactivate' : 'Activate'"
-                        th:attr="data-id=${user.id},data-type='deactivate'"
-                        onclick="openConfirmModal(this)">
-                </button>
+        <table class="table table-bordered" th:if="${adminUsers != null and !adminUsers.isEmpty()}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Active</th>
+            </tr>
+            </thead>
 
-                <button class="btn btn-danger btn-sm"
-                        th:attr="data-id=${user.id},data-type='delete'"
-                        onclick="openConfirmModal(this)">
-                    Delete
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="text-center mt-3">
-        <a href="/home" class="btn btn-secondary">← Back to Dashboard</a>
+            <tbody>
+            <tr th:each="admin : ${adminUsers}">
+                <td th:text="${admin.id}"></td>
+                <td th:text="${admin.username}"></td>
+                <td th:text="${admin.email}"></td>
+                <td th:text="${admin.role}"></td>
+                <td th:text="${admin.active}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
+
+
+    <!-- ==================== USER ACCOUNTS ==================== -->
+    <div class="card-box">
+        <h4 class="mb-3">
+            <i class="fa-solid fa-users me-2 text-primary"></i>
+            User Accounts
+        </h4>
+
+        <table class="table table-bordered" th:if="${normalUsers != null and !normalUsers.isEmpty()}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="user : ${normalUsers}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.role}"></td>
+                <td th:text="${user.active}"></td>
+
+                <td>
+                    <a th:href="@{'/admin/users/view/' + ${user.id}}"
+                       class="btn btn-view btn-sm btn-action">
+                        <i class="fa-solid fa-eye"></i> View
+                    </a>
+
+                    <button class="btn btn-deactivate btn-sm btn-action"
+                            th:text="${user.active} ? 'Deactivate' : 'Activate'"
+                            th:attr="data-id=${user.id},data-type='deactivate'"
+                            onclick="openConfirmModal(this)">
+                    </button>
+
+                    <button class="btn btn-delete btn-sm btn-action"
+                            th:attr="data-id=${user.id},data-type='delete'"
+                            onclick="openConfirmModal(this)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="text-center mt-4">
+        <a href="/admin/home" class="back-btn">
+            ← Back to Dashboard
+        </a>
+    </div>
+
 </div>
 
-<!-- ✅ Modal Bootstrap -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="confirmMessage">Are you sure you want to continue?</div>
+
+            <div class="modal-body" id="confirmMessage">
+                Are you sure you want to continue?
+            </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
                 <form id="confirmForm" method="post">
                     <button type="submit" class="btn btn-danger">Yes, proceed</button>
                 </form>
@@ -87,27 +193,30 @@
     </div>
 </div>
 
+
 <script>
     function openConfirmModal(button) {
         const userId = button.getAttribute("data-id");
         const actionType = button.getAttribute("data-type");
+
         const modal = new bootstrap.Modal(document.getElementById("confirmModal"));
         const form = document.getElementById("confirmForm");
         const message = document.getElementById("confirmMessage");
+        const header = document.querySelector(".modal-header");
 
         if (actionType === "delete") {
             form.action = "/admin/users/delete/" + userId;
             message.textContent = "Are you sure you want to permanently delete this user?";
-            document.querySelector(".modal-header").classList.add("bg-danger", "text-white");
-        } else if (actionType === "deactivate") {
+            header.className = "modal-header bg-danger text-white";
+        } else {
             form.action = "/admin/users/deactivate/" + userId;
             message.textContent = "Are you sure you want to change this user's status?";
-            document.querySelector(".modal-header").classList.remove("bg-danger");
-            document.querySelector(".modal-header").classList.add("bg-warning", "text-dark");
+            header.className = "modal-header bg-warning text-dark";
         }
 
         modal.show();
     }
 </script>
+
 </body>
 </html>
