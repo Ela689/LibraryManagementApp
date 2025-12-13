@@ -4,6 +4,7 @@ import com.example.librarymanagementapp.model.BorrowableBook;
 import com.example.librarymanagementapp.model.BorrowableBookHistory;
 import com.example.librarymanagementapp.repository.BorrowableBookRepository;
 import com.example.librarymanagementapp.repository.BorrowableBookHistoryRepository;
+import com.example.librarymanagementapp.repository.BorrowedBookRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,10 @@ public class AdminBorrowableBookController {
     @Autowired
     private BorrowableBookHistoryRepository historyRepo;
 
+    // ➕ ADAUGAT – pentru management împrumuturi
+    @Autowired
+    private BorrowedBookRepository borrowedBookRepo;
+
     // ============================================
     // LIST GROUPED
     // ============================================
@@ -35,9 +40,7 @@ public class AdminBorrowableBookController {
             grouped.computeIfAbsent(b.getCategory(), c -> new ArrayList<>()).add(b);
         }
 
-        // 🔥 FIX: trimitem groupedBooks ca în celelalte pagini
         model.addAttribute("groupedBooks", grouped);
-
         return "admin_borrowable_books";
     }
 
@@ -129,9 +132,6 @@ public class AdminBorrowableBookController {
     // ============================================
     // RESTORE BOOK
     // ============================================
-// ============================================
-// RESTORE BOOK (VERSIONA CORECTĂ PENTRU NOILE CÂMPURI)
-// ============================================
     @GetMapping("/restore/{historyId}")
     public String restoreBorrowable(@PathVariable Long historyId) {
 
@@ -141,7 +141,6 @@ public class AdminBorrowableBookController {
 
             BorrowableBook restored = new BorrowableBook();
 
-            // ---- câmpurile originale ----
             restored.setTitle(h.getTitle());
             restored.setAuthor(h.getAuthor());
             restored.setYear(h.getYear());
@@ -149,7 +148,6 @@ public class AdminBorrowableBookController {
             restored.setQuantity(h.getQuantity());
             restored.setBorrowed(h.getBorrowed());
 
-            // ---- câmpurile noi adăugate în DB ----
             restored.setCollection(h.getCollection());
             restored.setCover_type(h.getCover_type());
             restored.setEdition(h.getEdition());
@@ -161,14 +159,11 @@ public class AdminBorrowableBookController {
             restored.setTranslator(h.getTranslator());
 
             borrowRepo.save(restored);
-
-            // ștergem intrarea din istoric
             historyRepo.delete(h);
         }
 
         return "redirect:/admin/borrowable/history";
     }
-
 
     // ============================================
     // CLEAR HISTORY
@@ -178,4 +173,46 @@ public class AdminBorrowableBookController {
         historyRepo.deleteAll();
         return "redirect:/admin/borrowable/history";
     }
+
+    // ============================================
+    // ADMIN – BORROW RECORDS (USER ↔ BOOK)
+    // ============================================
+    @GetMapping("/borrows")
+    public String adminBorrowRecords(Model model) {
+
+        model.addAttribute("borrows", borrowedBookRepo.findAll());
+        return "admin_borrow_management";
+    }
+
+    // ============================
+    // ADMIN – RESET LATE FEE
+    // ============================
+    @GetMapping("/borrow/reset/{id}")
+    public String resetLateFee(@PathVariable Long id) {
+        borrowedBookRepo.findById(id).ifPresent(b -> {
+            b.setLateFee(0.0);
+            borrowedBookRepo.save(b);
+        });
+        return "redirect:/admin/borrowable/borrows";
+    }
+
+    // ============================
+    // ADMIN – DELETE BORROW
+    // ============================
+    @GetMapping("/borrow/delete/{id}")
+    public String deleteBorrow(@PathVariable Long id) {
+
+        borrowedBookRepo.findById(id).ifPresent(b -> {
+            // refacem stocul dacă nu era returnată
+            if (!b.isReturned()) {
+                BorrowableBook book = b.getBook();
+                book.setBorrowed(book.getBorrowed() - 1);
+                borrowRepo.save(book);
+            }
+            borrowedBookRepo.delete(b);
+        });
+
+        return "redirect:/admin/borrowable/borrows";
+    }
+
 }

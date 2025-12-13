@@ -1,13 +1,19 @@
 package com.example.librarymanagementapp.repository;
 
 import com.example.librarymanagementapp.model.BorrowedBook;
+import com.example.librarymanagementapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface BorrowedBookRepository extends JpaRepository<BorrowedBook, Long> {
+
+    // =========================
+    // EXISTENTE (NU LE ATINGEM)
+    // =========================
 
     // toate împrumuturile unui user
     List<BorrowedBook> findByUserId(Long userId);
@@ -19,5 +25,12 @@ public interface BorrowedBookRepository extends JpaRepository<BorrowedBook, Long
     List<BorrowedBook> findByReturnedFalse();
 
     // toate împrumuturile întârziate (pentru penalizări)
-    List<BorrowedBook> findByReturnedFalseAndDueDateBefore(java.time.LocalDate date);
+    List<BorrowedBook> findByReturnedFalseAndDueDateBefore(LocalDate date);
+
+    // =========================
+    // ➕ ADAUGAT (NECESAR)
+    // =========================
+
+    // împrumuturi active ale unui user (folosit în BorrowService)
+    List<BorrowedBook> findByUserAndReturnedFalse(User user);
 }

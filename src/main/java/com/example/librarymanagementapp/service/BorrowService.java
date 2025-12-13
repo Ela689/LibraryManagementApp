@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class BorrowService {
@@ -19,16 +20,31 @@ public class BorrowService {
     @Autowired private BorrowableBookRepository bookRepo;
     @Autowired private BorrowedBookRepository borrowedRepo;
 
-    // ===============================
-    // 1️⃣ Imprumutarea unei carti
-    // ===============================
+    // =====================================================
+    //  IMPRUMUTAREA UNEI CARTI (CU RESTRICTIE 1 / USER)
+    // =====================================================
     public String borrowBook(Long userId, Long bookId) {
 
         User user = userRepo.findById(userId).orElse(null);
         BorrowableBook book = bookRepo.findById(bookId).orElse(null);
 
-        if (user == null || book == null) return "User or book not found";
-        if (book.getQuantity() - book.getBorrowed() <= 0) return "No copies available";
+        if (user == null || book == null)
+            return "User or book not found";
+
+        if (borrowedRepo.existsByUserIdAndBookIdAndReturnedFalse(userId, bookId)) {
+            return "ALREADY_BORROWED";
+        }//adaugat recent
+
+        // REGULĂ NOUĂ: user NU poate împrumuta aceeași carte de 2 ori
+        boolean alreadyBorrowed =
+                borrowedRepo.existsByUserIdAndBookIdAndReturnedFalse(userId, bookId);
+
+        if (alreadyBorrowed)
+            return "You already borrowed this book";
+
+        // verificăm stocul
+        if (book.getQuantity() - book.getBorrowed() <= 0)
+            return "No copies available";
 
         // actualizam stocul
         book.setBorrowed(book.getBorrowed() + 1);
@@ -38,7 +54,7 @@ public class BorrowService {
                 user,
                 book,
                 LocalDate.now(),
-                LocalDate.now().plusDays(20)   // termen 20 zile
+                LocalDate.now().plusDays(14) // 🔔 14 zile (cum ai cerut)
         );
 
         borrowedRepo.save(br);
@@ -46,23 +62,24 @@ public class BorrowService {
         return "SUCCESS";
     }
 
-    // ===============================
-    // 2️⃣ Returnarea unei carti
-    // ===============================
+
+    // =====================================================
+    // RETURNAREA UNEI CARTI
+    // =====================================================
     public String returnBook(Long borrowId) {
 
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
         if (br == null) return "Borrow record not found";
 
-        // Marcam returnarea
         br.setReturnDate(LocalDate.now());
 
-        // Calculam penalizarea (daca exista intarziere):
+        // calcul penalizare
         if (br.getReturnDate().isAfter(br.getDueDate())) {
 
-            long daysLate = ChronoUnit.DAYS.between(br.getDueDate(), br.getReturnDate());
+            long daysLate =
+                    ChronoUnit.DAYS.between(br.getDueDate(), br.getReturnDate());
 
-            br.setLateFee(daysLate * 20.0); // 20 lei pe zi, DOUBLE FIXED
+            br.setLateFee(daysLate * 20.0); // 20 lei / zi
         } else {
             br.setLateFee(0.0);
         }
@@ -78,10 +95,11 @@ public class BorrowService {
         return "SUCCESS";
     }
 
-    // ===============================
-    // 3️⃣ Stergere / Resetare penalizare de catre ADMIN
-    // ===============================
+    // =====================================================
+    // ADMIN – RESETARE PENALIZARE
+    // =====================================================
     public String resetLateFee(Long borrowId) {
+
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
         if (br == null) return "Not found";
 
@@ -91,15 +109,14 @@ public class BorrowService {
         return "RESET_OK";
     }
 
-    // ===============================
-    // 4️⃣ ADMIN sterge complet un imprumut
-    // ===============================
+    // =====================================================
+    // ADMIN – STERGERE COMPLETA IMPRUMUT
+    // =====================================================
     public String adminDeleteBorrow(Long borrowId) {
 
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
         if (br == null) return "Not found";
 
-        // reactivam stocul, daca cartea nu returnata
         if (!br.isReturned()) {
             BorrowableBook bk = br.getBook();
             bk.setBorrowed(bk.getBorrowed() - 1);
@@ -108,5 +125,17 @@ public class BorrowService {
 
         borrowedRepo.delete(br);
         return "DELETED";
+    }
+
+    // =====================================================
+    // METODA HELPER – RESTRICTIE 1 CARTE / USER
+    // =====================================================
+    private boolean userAlreadyBorrowedThisBook(User user, BorrowableBook book) {
+
+        List<BorrowedBook> activeBorrows =
+                borrowedRepo.findByUserAndReturnedFalse(user);
+
+        return activeBorrows.stream()
+                .anyMatch(b -> b.getBook().getId().equals(book.getId()));
     }
 }
