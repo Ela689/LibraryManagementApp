@@ -1,102 +1,179 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>User Dashboard</title>
+    <title>User Home</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
         body {
-            background:#eef3f9;
-            padding:40px;
-            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:
+                    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+                    url("https://images.unsplash.com/photo-1507842217343-583bb7270b66");
+            background-size: cover;
+            background-position: center;
         }
 
-        .page-title {
-            color:#0057d8;
-            font-weight:700;
-            font-size:32px;
-            margin-bottom:40px;
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
         }
 
-        .menu-box {
-            background:white;
-            padding:35px;
-            border-radius:18px;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            transition: .25s;
-            cursor:pointer;
-            border-left:10px solid #0057d8;
-            text-align:center;
+        /* 🔥 GLASS EFFECT */
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            padding: 35px 40px 45px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
         }
 
-        .menu-box:hover {
-            transform: translateY(-6px);
-            box-shadow:0 8px 20px rgba(0,0,0,0.15);
+        .welcome-title {
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .menu-icon {
-            font-size:48px;
-            margin-bottom:15px;
-            color:#0057d8;
+        .welcome-subtitle {
+            color: #e0e0e0;
+            font-size: 14px;
+            margin-bottom: 35px;
         }
 
-        .logout-btn {
-            margin-top:50px;
+        /* 🟦 ONE ROW DASHBOARD */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 26px;
+        }
+
+        .card-box {
+            background: rgba(255,255,255,0.85);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+            transition: all 0.25s ease;
+            border-left: 6px solid #0d6efd;
+        }
+
+        .card-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 36px rgba(0,0,0,0.35);
+            text-decoration: none;
+        }
+
+        .card-box.borrow {
+            border-left-color: #f4b400;
+        }
+
+        .card-box.digital {
+            border-left-color: #0dcaf0;
+        }
+
+        .card-box.history {
+            border-left-color: #dc3545;
+        }
+
+        .card-box i {
+            font-size: 42px;
+            margin-bottom: 12px;
+            color: inherit;
+        }
+
+        .card-box h5 {
+            font-weight: 600;
+            margin: 0;
+            color: #212529;
+        }
+
+        .logout-box {
+            text-align: center;
+            margin-top: 45px;
+        }
+
+        .logout-box button {
+            padding: 10px 34px;
+            border-radius: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+        }
+
+        /* 📱 RESPONSIVE */
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="page-wrapper">
 
-    <h2 class="page-title">
-        <i class="fa-solid fa-user"></i>
-        Welcome, <span th:text="${user.username}"></span>
-    </h2>
+    <div class="dashboard-wrapper">
 
-    <div class="row g-4">
+        <h3 class="welcome-title">
+            <i class="bi bi-person-circle"></i>
+            Welcome, <span th:text="${user.username}">User</span>
+        </h3>
 
-        <!-- View Physical Books -->
-        <div class="col-md-4">
-            <a href="/user/books/physical" style="text-decoration:none;">
-                <div class="menu-box">
-                    <i class="fa-solid fa-book menu-icon"></i>
-                    <h4>Physical Books</h4>
-                </div>
-            </a>
+        <div class="welcome-subtitle">
+            Explore, borrow and manage your books
         </div>
 
-        <!-- Borrowable Books -->
-        <div class="col-md-4">
-            <a href="/user/books/borrowable" style="text-decoration:none;">
-                <div class="menu-box" style="border-left-color:#f1c40f;">
-                    <i class="fa-solid fa-book-bookmark menu-icon" style="color:#f1c40f;"></i>
-                    <h4>Borrowable Books</h4>
-                </div>
+        <div class="dashboard">
+
+            <a href="/user/books/physical" class="card-box">
+                <i class="bi bi-book"></i>
+                <h5>Physical Books</h5>
             </a>
+
+            <a href="/user/borrowable" class="card-box borrow">
+                <i class="bi bi-journal-bookmark"></i>
+                <h5>Borrowable Books</h5>
+            </a>
+
+            <a href="/user/books/digital" class="card-box digital">
+                <i class="bi bi-tablet"></i>
+                <h5>Digital Books</h5>
+            </a>
+
+            <a href="/user/borrowable/my-borrows" class="card-box history">
+                <i class="bi bi-clock-history"></i>
+                <h5>My Borrowed Books</h5>
+            </a>
+
         </div>
 
-        <!-- Digital Books -->
-        <div class="col-md-4">
-            <a href="/user/books/digital" style="text-decoration:none;">
-                <div class="menu-box" style="border-left-color:#007bff;">
-                    <i class="fa-solid fa-tablet-screen-button menu-icon" style="color:#007bff;"></i>
-                    <h4>Digital Books</h4>
-                </div>
-            </a>
+        <div class="logout-box">
+            <form action="/logout" method="post">
+                <button class="btn btn-danger">Logout</button>
+            </form>
         </div>
 
     </div>
-
-    <!-- LOGOUT -->
-    <form method="post" action="/logout" class="text-center logout-btn">
-        <button class="btn btn-danger px-4">Logout</button>
-    </form>
 
 </div>
 

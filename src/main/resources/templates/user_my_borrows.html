@@ -1,90 +1,155 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>My Borrowed Books</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        body { background:#f4f6fc; }
-        .card { border-radius:12px; }
-        .late { color:#dc2626; font-weight:600; }
-        .ok { color:#16a34a; font-weight:600; }
+        body {
+            background: #f4f6fb;
+            padding: 40px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0d6efd;
+            margin-bottom: 25px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        /* Row states */
+        .row-returned {
+            background-color: #e9f7ef;
+        }
+
+        .row-active {
+            background-color: #fff9e6;
+        }
+
+        .row-overdue {
+            background-color: #fdecea;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-returned {
+            background-color: #198754;
+            color: white;
+        }
+
+        .status-active {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .status-overdue {
+            background-color: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
 
-<div class="container mt-4">
+<div class="container">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary mb-0">📖 My Borrowed Books</h2>
-
-        <a href="/user/home" class="btn btn-outline-secondary">
-            ← Home
-        </a>
+    <div class="page-title">
+        📚 My Borrowed Books
     </div>
 
-    <!-- EMPTY STATE -->
-    <div th:if="${#lists.isEmpty(borrows)}"
-         class="alert alert-info">
-        You have no borrowed books.
+    <!-- ================= WARNING / PENALTY INFO ================= -->
+    <div class="alert alert-warning mb-4">
+        <strong>⚠ Important information about late fees & penalties</strong>
+
+        <p class="mt-2 mb-2">
+            Please make sure to return borrowed books on time to avoid penalties.
+        </p>
+
+        <ul class="mb-2">
+            <li>📅 Each book has a <b>due date</b> displayed below.</li>
+            <li>⏳ Returning a book <b>after the due date</b> will generate a penalty.</li>
+            <li>💰 <b>Late fee:</b> <span class="text-danger fw-bold">5 lei / day</span> for each overdue day.</li>
+            <li>🔄 Late fees are calculated <b>automatically</b> by the system.</li>
+            <li>🧾 Penalties must be settled at the library desk.</li>
+        </ul>
+
+        <small class="text-muted">
+            Example: If a book is returned 3 days late, the total penalty will be
+            <b>15 lei</b>.
+        </small>
     </div>
 
-    <div th:if="${!#lists.isEmpty(borrows)}"
-         class="card shadow-sm">
-        <div class="card-body">
+    <!-- ================= TABLE ================= -->
+    <div class="table-container">
 
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                <tr>
-                    <th>Book</th>
-                    <th>Borrowed</th>
-                    <th>Due</th>
-                    <th>Status</th>
-                    <th>Late Fee</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
+        <table class="table align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Book</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Late Fee</th>
+            </tr>
+            </thead>
 
-                <tbody>
-                <tr th:each="b : ${borrows}">
+            <tbody>
+            <tr th:each="b : ${borrows}"
+                th:classappend="
+                    ${b.returned} ? 'row-returned' :
+                    (${b.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'row-overdue' : 'row-active')
+                ">
 
-                    <td>
-                        <b th:text="${b.book.title}">Title</b><br>
-                        <small th:text="${b.book.author}">Author</small>
-                    </td>
+                <td>
+                    <strong th:text="${b.book.title}"></strong><br>
+                    <small class="text-muted" th:text="${b.book.author}"></small>
+                </td>
 
-                    <td th:text="${b.borrowDate}"></td>
-                    <td th:text="${b.dueDate}"></td>
+                <td th:text="${b.borrowDate}"></td>
 
-                    <td>
-                        <span th:if="${b.returned}" class="ok">Returned</span>
-                        <span th:if="${!b.returned and b.dueDate.isBefore(T(java.time.LocalDate).now())}"
-                              class="late">Late</span>
-                        <span th:if="${!b.returned and !b.dueDate.isBefore(T(java.time.LocalDate).now())}"
-                              class="ok">Active</span>
-                    </td>
+                <td th:text="${b.dueDate}"></td>
 
-                    <td th:text="${b.lateFee} + ' lei'"></td>
+                <td>
+                    <span class="status-badge"
+                          th:classappend="
+                            ${b.returned} ? 'status-returned' :
+                            (${b.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'status-overdue' : 'status-active')
+                          "
+                          th:text="
+                            ${b.returned} ? 'Returned' :
+                            (${b.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'Overdue' : 'Active')
+                          ">
+                    </span>
+                </td>
 
-                    <td>
-                        <form th:if="${!b.returned}"
-                              th:action="@{'/user/borrowable/return/' + ${b.id}}"
-                              method="post">
-                            <button class="btn btn-sm btn-success">
-                                Return
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                <td>
+                    <span th:text="${b.lateFee}"></span> lei
+                </td>
 
-        </div>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
+
+    <a href="/user/home" class="btn btn-secondary mt-4">
+        ← Back
+    </a>
 
 </div>
 

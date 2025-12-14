@@ -14,7 +14,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user/borrowable")
@@ -32,50 +35,49 @@ public class UserBorrowableBookController {
     @Autowired
     private BorrowService borrowService;
 
-    // ============================================
-    // 📚 LISTĂ CĂRȚI DISPONIBILE PENTRU IMPRUMUT
-    // ============================================
+    // ==================================================
+    // 📚 LISTĂ CĂRȚI DISPONIBILE (GROUPATE PE CATEGORII)
+    // ==================================================
     @GetMapping
     public String listBorrowableBooks(Model model) {
 
         List<BorrowableBook> books = borrowableRepo.findAll();
-        model.addAttribute("books", books);
 
-        return "user_borrowable_books"; // ⚠️ trebuie să existe HTML-ul
+        Map<String, List<BorrowableBook>> groupedBooks =
+                books.stream().collect(
+                        Collectors.groupingBy(
+                                BorrowableBook::getCategory,
+                                LinkedHashMap::new,
+                                Collectors.toList()
+                        )
+                );
+
+        model.addAttribute("groupedBooks", groupedBooks);
+        return "user_books_borrowable";
     }
 
-    // ============================================
-    // ➕ BORROW BOOK (MAXIM 1 EXEMPLAR / USER)
-    // ============================================
+    // ==================================================
+    // ➕ BORROW BOOK
+    // ==================================================
     @PostMapping("/borrow/{bookId}")
-    public String borrowBook(@PathVariable Long bookId,
-                             Authentication auth,
-                             Model model) {
+    public String borrowBook(@PathVariable Long bookId, Authentication auth) {
 
-        // 🔥 FIX: findByUsername returnează User, NU Optional
         User user = userRepo.findByUsername(auth.getName());
-
         if (user == null) {
             return "redirect:/login";
         }
 
-        String result = borrowService.borrowBook(user.getId(), bookId);
-
-        if (!"SUCCESS".equals(result)) {
-            model.addAttribute("error", result);
-        }
-
+        borrowService.borrowBook(user.getId(), bookId);
         return "redirect:/user/borrowable";
     }
 
-    // ============================================
+    // ==================================================
     // 📜 ISTORIC IMPRUMUTURI USER
-    // ============================================
+    // ==================================================
     @GetMapping("/my-borrows")
     public String myBorrows(Authentication auth, Model model) {
 
         User user = userRepo.findByUsername(auth.getName());
-
         if (user == null) {
             return "redirect:/login";
         }
@@ -86,13 +88,28 @@ public class UserBorrowableBookController {
         return "user_my_borrows";
     }
 
-    // ============================================
+    // ==================================================
     // 🔁 RETURN BOOK
-    // ============================================
+    // ==================================================
     @PostMapping("/return/{borrowId}")
     public String returnBook(@PathVariable Long borrowId) {
 
         borrowService.returnBook(borrowId);
         return "redirect:/user/borrowable/my-borrows";
+    }
+
+    // ==================================================
+    // 📖 DETAILS – BORROWABLE BOOK (USER)
+    // ==================================================
+    @GetMapping("/details/{id}")
+    public String borrowableDetails(@PathVariable Long id, Model model) {
+
+        BorrowableBook book = borrowableRepo.findById(id).orElse(null);
+        if (book == null) {
+            return "redirect:/user/borrowable";
+        }
+
+        model.addAttribute("book", book);
+        return "user_borrowable_book_details";
     }
 }

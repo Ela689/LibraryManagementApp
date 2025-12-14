@@ -4,26 +4,117 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <style>
-        body { background: #f8f9fa; font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); width: 300px; }
-        h2 { text-align: center; color: #333; }
-        input, button { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        a { text-decoration: none; color: #007bff; text-align: center; display: block; }
-        .error { color: red; text-align: center; }
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background:
+                    url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f") no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.85); /* Slightly transparent background */
+            padding: 35px 30px;
+            border-radius: 20px; /* More rounded corners */
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+        }
+
+        .icon {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #0d6efd;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #0d6efd;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 2px rgba(13,110,253,0.2);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: #0d6efd;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0b5ed7;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0d6efd;
+            text-align: center;
+            display: block;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #dc3545;
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+
 <div class="login-box">
-    <h2>Please Sign In</h2>
+    <div class="icon">
+        <i class="fa-solid fa-book-open"></i> <!-- Optional Icon -->
+    </div>
+    <h2>Library System</h2>
+    <p class="subtitle">Sign in to access your account</p>
+
     <form th:action="@{/login}" method="post">
         <div th:if="${param.error}" class="error">Invalid credentials or account not active!</div>
-        <input type="text" name="username" placeholder="Username" required/>
-        <input type="password" name="password" placeholder="Password" required/>
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
         <button type="submit">Sign In</button>
     </form>
+
     <a href="/register">Create new account</a>
 </div>
+
 </body>
 </html>

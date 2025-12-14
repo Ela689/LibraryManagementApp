@@ -138,4 +138,18 @@ public class BorrowService {
         return activeBorrows.stream()
                 .anyMatch(b -> b.getBook().getId().equals(book.getId()));
     }
+
+    public void runLateCheck() {
+        borrowedRepo.findByReturnedFalse()
+                .forEach(borrow -> {
+                    if (borrow.getDueDate().isBefore(LocalDate.now())) {
+                        long daysLate = ChronoUnit.DAYS.between(
+                                borrow.getDueDate(), LocalDate.now()
+                        );
+                        borrow.setLateFee(daysLate * 20.0);
+                        borrowedRepo.save(borrow);
+                    }
+                });
+    }
+
 }
