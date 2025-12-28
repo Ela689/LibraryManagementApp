@@ -74,6 +74,59 @@ Relationships:
 
 ---
 
+## 🎥 Demo Videos
+
+The application functionality is demonstrated through recorded demo videos, available via **GitHub Releases**.
+
+### 👤 User Interface Demo
+Demonstrates:
+- Browsing borrowable, physical, and digital books  
+- Borrowing workflow  
+- Viewing personal borrowing history  
+- Late fee visualization  
+
+▶️ **User Demo Video:**  
+https://github.com/Ela689/LibraryManagementApp/releases/download/v1.0-demo/user-demo.mp4
+
+---
+
+### 🛠️ Admin Interface Demo
+Demonstrates:
+- Viewing all borrow records  
+- Marking books as returned  
+- Running late-fee checks  
+- Resetting penalties  
+- Sending email notifications to users  
+
+▶️ **Admin Demo Video:**  
+https://github.com/Ela689/LibraryManagementApp/releases/download/v1.0-demo/admin-demo.mp4
+
+---
+
+## 📧 Email Notification Feature (Admin)
+
+Administrators can send **email reminders** to users regarding upcoming book return deadlines.
+
+- Emails are sent manually from the admin panel  
+- Recipient email is auto-filled but editable  
+- Messages are delivered via **Gmail SMTP**  
+- Helps prevent late returns and penalties  
+
+---
+
+## 🧪 Admin Actions Explained
+
+- **Run check now**  
+  Triggers late-fee calculation for all active borrowings.
+
+- **Reset Fee**  
+  Clears the late fee for a specific borrowing record.
+
+- **Send Notification**  
+  Sends a reminder email to the user about returning a borrowed book.
+
+---
+
 ## 🚀 How to Run the Project
 
 ### 1️⃣ Clone the repository
