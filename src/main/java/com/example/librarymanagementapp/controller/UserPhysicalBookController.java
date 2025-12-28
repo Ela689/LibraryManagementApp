@@ -106,8 +106,8 @@ public class UserPhysicalBookController {
     }
 
     // ============================
-// CLEAR HISTORY
-// ============================
+    // CLEAR HISTORY
+    // ============================
     @PostMapping("/history/clear")
     public String clearHistory(HttpSession session) {
         session.removeAttribute("physicalHistory");

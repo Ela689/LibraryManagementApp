@@ -37,9 +37,10 @@ public class UserBorrowableBookController {
 
     // ==================================================
     // 📚 LISTĂ CĂRȚI DISPONIBILE (GROUPATE PE CATEGORII)
+    // + ID-urile cărților deja împrumutate de user
     // ==================================================
     @GetMapping
-    public String listBorrowableBooks(Model model) {
+    public String listBorrowableBooks(Authentication auth, Model model) {
 
         List<BorrowableBook> books = borrowableRepo.findAll();
 
@@ -53,6 +54,22 @@ public class UserBorrowableBookController {
                 );
 
         model.addAttribute("groupedBooks", groupedBooks);
+
+        // 🔹 Cărți deja împrumutate de user (pentru sticker + disable)
+        if (auth != null) {
+            User user = userRepo.findByUsername(auth.getName());
+            if (user != null) {
+
+                List<Long> borrowedBookIds =
+                        borrowedRepo.findByUserAndReturnedFalse(user)
+                                .stream()
+                                .map(b -> b.getBook().getId())
+                                .toList();
+
+                model.addAttribute("borrowedBookIds", borrowedBookIds);
+            }
+        }
+
         return "user_books_borrowable";
     }
 

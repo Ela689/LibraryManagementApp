@@ -8,170 +8,183 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        /* ================= BACKGROUND ================= */
         body {
-            background: #eef3f9;
+            min-height: 100vh;
+            background:
+                    linear-gradient(
+                            rgba(20,30,50,0.15),
+                            rgba(20,30,50,0.15)
+                    ),
+                    url("https://images.unsplash.com/photo-1507842217343-583bb7270b66");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             padding: 40px;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Segoe UI", system-ui, sans-serif;
         }
 
-        /* Search + Filter Section */
+        /* ================= HEADER ================= */
+        h2 {
+            font-weight: 800;
+            color: #2563eb;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+
+        /* ================= FILTER BOX ================= */
         .filter-box {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
             margin-bottom: 30px;
         }
 
+        /* ================= CATEGORY CARD ================= */
         .category-box {
-            background: #fff;
-            border-radius: 14px;
+            background: linear-gradient(135deg, #93c5fd, #2563eb);
+            border-radius: 20px;
             padding: 18px 25px;
-            margin-bottom: 20px;
-            border-left: 8px solid #0057d8;
+            margin-bottom: 18px;
             cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 22px 45px rgba(0,0,0,0.35);
+            transition: transform 0.15s ease;
+        }
+
+        .category-box:hover {
+            transform: translateY(-2px);
         }
 
         .category-title {
             display: flex;
             justify-content: space-between;
-            font-size: 22px;
-            font-weight: 700;
-            color: #0057d8;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
         }
 
+        /* ================= BOOK LIST ================= */
         .book-row {
-            padding: 12px 5px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .btn-view {
-            background: #6c63ff;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 6px;
-            margin-right: 6px;
-            border: none;
+        .book-row:last-child {
+            border-bottom: none;
         }
 
-        .btn-download {
-            background: #1abc9c;
+        /* ================= BUTTONS ================= */
+        .view-btn {
+            background: #2563eb;
             color: white;
-            padding: 5px 12px;
-            border-radius: 6px;
-            border: none;
+            padding: 6px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        /* HISTORY BOX */
+        .view-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        .download-btn {
+            background: #16a34a;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        /* ================= HISTORY ================= */
         #historyToggle {
             position: fixed;
             top: 20px;
             right: 25px;
-            background: #007bff;
+            background: #2563eb;
             color: white;
-            padding: 10px 18px;
-            border-radius: 40px;
+            padding: 10px 20px;
+            border-radius: 999px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             z-index: 999;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
         }
 
         #historyBox {
             position: fixed;
             top: 70px;
             right: 25px;
-            width: 300px;
-            max-height: 400px;
+            width: 320px;
+            max-height: 420px;
             overflow-y: auto;
-            background: white;
-            border-radius: 14px;
-            padding: 15px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(14px);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 22px 50px rgba(0,0,0,0.45);
             display: none;
             z-index: 999;
-        }
-
-        #historyList a {
-            text-decoration: none;
-            font-weight: 500;
-            color: #0057d8;
-        }
-
-        #historyList a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
 
-<h2 class="text-primary mb-4">
+<h2 class="mb-4">
     <i class="fa-solid fa-tablet-screen-button"></i> Digital Books
 </h2>
 
-<!-- ============================ -->
-<!-- SEARCH + SORT -->
-<!-- ============================ -->
+<!-- ================= FILTERS ================= -->
 <div class="filter-box">
     <div class="row g-3">
-
-        <!-- SEARCH -->
         <div class="col-md-6">
-            <input type="text" id="searchInput" class="form-control"
-                   placeholder="Search by title, author, year...">
+            <input id="searchInput" class="form-control"
+                   placeholder="Search by title, author or year">
         </div>
 
-        <!-- CATEGORY FILTER (optional, pentru design la fel) -->
         <div class="col-md-3">
             <select id="categoryFilter" class="form-select">
-                <option value="">All categories</option>
+                <option value="">All Categories</option>
                 <option th:each="entry : ${groupedBooks}"
-                        th:text="${entry.key}"
-                        th:value="${entry.key}"></option>
+                        th:value="${entry.key}"
+                        th:text="${entry.key}">
+                </option>
             </select>
         </div>
 
-        <!-- SORT -->
         <div class="col-md-3">
             <select id="sortSelect" class="form-select">
-                <option value="title"
-                        th:selected="${param.sort} == null or ${param.sort} == 'title'">
-                    Sort by title
-                </option>
-                <option value="author"
-                        th:selected="${param.sort} == 'author'">
-                    Sort by author
-                </option>
-                <option value="year"
-                        th:selected="${param.sort} == 'year'">
-                    Sort by year
-                </option>
+                <option value="title">Sort by title</option>
+                <option value="author">Sort by author</option>
+                <option value="year">Sort by year</option>
             </select>
         </div>
-
     </div>
 </div>
 
-<!-- HISTORY BUTTON -->
+<!-- ================= HISTORY ================= -->
 <div id="historyToggle">
     <i class="fa-solid fa-clock-rotate-left"></i> History
 </div>
 
-<!-- FLOATING HISTORY PANEL -->
 <div id="historyBox">
-    <h5><i class="fa-solid fa-clock-rotate-left"></i> Recent Views</h5>
+    <h5 class="fw-bold mb-3">Recent Views</h5>
     <ul id="historyList" class="list-group mb-3"></ul>
     <button class="btn btn-danger btn-sm w-100" onclick="clearHistory()">Clear History</button>
 </div>
 
-
-<!-- ============================ -->
-<!-- CATEGORY SECTIONS -->
-<!-- ============================ -->
+<!-- ================= BOOK LIST ================= -->
 <div class="container">
 
     <div th:each="entry, iter : ${groupedBooks}">
@@ -180,14 +193,13 @@
              data-bs-toggle="collapse"
              th:data-bs-target="'#cat' + ${iter.index}">
             <div class="category-title">
-                <span class="category-name" th:text="${entry.key}"></span>
+                <span th:text="${entry.key}"></span>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
         </div>
 
-        <div class="collapse"
-             th:id="'cat' + ${iter.index}">
-            <div class="bg-white p-3 rounded">
+        <div class="collapse" th:id="'cat' + ${iter.index}">
+            <div class="bg-white rounded-4 p-3 mb-3">
 
                 <div class="book-row"
                      th:each="b : ${entry.value}"
@@ -195,8 +207,7 @@
                      th:data-title="${b.title}"
                      th:data-author="${b.author}"
                      th:data-year="${b.year}"
-                     th:data-category="${b.category}"
-                >
+                     th:data-category="${b.category}">
 
                     <div>
                         <b th:text="${b.title}"></b> –
@@ -204,56 +215,43 @@
                         (<span th:text="${b.year}"></span>)
                     </div>
 
-                    <div class="d-flex">
-
-                        <!-- VIEW -->
+                    <div class="d-flex gap-2">
                         <a th:href="@{'/user/books/digital/view/' + ${b.fileName}}"
                            target="_blank"
-                           class="btn-view"
+                           class="view-btn"
                            th:onclick="|saveHistory(${b.id})|">
-                            <i class="fa-solid fa-eye"></i> View
+                            View
                         </a>
 
-                        <!-- DOWNLOAD -->
                         <a th:href="@{'/user/books/digital/download/' + ${b.fileName}}"
-                           class="btn-download ms-2">
-                            <i class="fa-solid fa-download"></i> Download
+                           class="download-btn">
+                            Download
                         </a>
                     </div>
 
                 </div>
-
             </div>
         </div>
 
     </div>
 
     <a href="/user/home" class="btn btn-secondary mt-4">← Back</a>
-
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- ================= JS – NEMODIFICAT ================= -->
 <script>
-    /* =======================================================
-       SEARCH + CATEGORY FILTER
-    ======================================================= */
     function applyFilters() {
         let text = document.getElementById("searchInput").value.toLowerCase();
         let category = document.getElementById("categoryFilter").value;
 
         document.querySelectorAll(".book-row").forEach(row => {
-            const title = row.dataset.title.toLowerCase();
-            const author = row.dataset.author.toLowerCase();
-            const year = row.dataset.year;
-            const rowCategory = row.dataset.category;
-
             let match =
-                (title.includes(text) ||
-                    author.includes(text) ||
-                    year.includes(text)) &&
-                (category === "" || category === rowCategory);
+                (row.dataset.title.toLowerCase().includes(text) ||
+                    row.dataset.author.toLowerCase().includes(text) ||
+                    row.dataset.year.includes(text)) &&
+                (category === "" || row.dataset.category === category);
 
             row.style.display = match ? "" : "none";
         });
@@ -261,70 +259,40 @@
 
     document.getElementById("searchInput").addEventListener("keyup", applyFilters);
     document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+    document.getElementById("sortSelect").addEventListener("change",
+        e => location.href = "/user/books/digital?sort=" + e.target.value);
 
-
-    /* =======================================================
-       SORT (server-side)
-    ======================================================= */
-    document.getElementById("sortSelect").addEventListener("change", function () {
-        let sortField = this.value;
-        window.location.href = "/user/books/digital?sort=" + sortField;
-    });
-
-
-    /* =======================================================
-       HISTORY (localStorage) – similar cu borrowable
-    ======================================================= */
     function saveHistory(id) {
         const row = document.getElementById("digital-" + id);
-        if (!row) return;
-
-        const title = row.dataset.title;
-        const fileName = row.querySelector(".btn-view")
-            .getAttribute("href")
-            .split("/view/")[1];
+        let file = row.querySelector(".view-btn").href.split("/view/")[1];
+        let title = row.dataset.title;
 
         let list = JSON.parse(localStorage.getItem("digitalHistory") || "[]");
-
-        // scoatem duplicatele
-        list = list.filter(item => item.id !== id);
-
-        // punem primul
-        list.unshift({id, title, fileName});
-
-        // maxim 10 intrări
+        list = list.filter(x => x.id !== id);
+        list.unshift({id, title, file});
         if (list.length > 10) list.pop();
 
         localStorage.setItem("digitalHistory", JSON.stringify(list));
     }
 
-    function loadHistory() {
-        let list = JSON.parse(localStorage.getItem("digitalHistory") || "[]");
-        let box = document.getElementById("historyList");
-
-        box.innerHTML = "";
-
-        list.forEach(item => {
-            let li = document.createElement("li");
-            li.classList.add("list-group-item");
-
-            li.innerHTML =
-                `<i class="fa-solid fa-file-pdf me-2 text-danger"></i>
-                 <a href="/user/books/digital/view/${item.fileName}" target="_blank">${item.title}</a>`;
-
-            box.appendChild(li);
-        });
-    }
-
     function clearHistory() {
         localStorage.removeItem("digitalHistory");
-        loadHistory();
+        document.getElementById("historyList").innerHTML = "";
     }
 
     document.getElementById("historyToggle").onclick = () => {
         let box = document.getElementById("historyBox");
         box.style.display = box.style.display === "block" ? "none" : "block";
-        loadHistory();
+
+        let list = JSON.parse(localStorage.getItem("digitalHistory") || "[]");
+        let ul = document.getElementById("historyList");
+        ul.innerHTML = "";
+
+        list.forEach(b => {
+            ul.innerHTML += `<li class="list-group-item">
+                <a href="/user/books/digital/view/${b.file}" target="_blank">${b.title}</a>
+            </li>`;
+        });
     };
 </script>
 

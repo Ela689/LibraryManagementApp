@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 public class BorrowService {
@@ -21,32 +20,28 @@ public class BorrowService {
     @Autowired private BorrowedBookRepository borrowedRepo;
 
     // =====================================================
-    //  IMPRUMUTAREA UNEI CARTI (CU RESTRICTIE 1 / USER)
+    //  IMPRUMUTAREA UNEI CARTI (1 EXEMPLAR / USER)
     // =====================================================
     public String borrowBook(Long userId, Long bookId) {
 
         User user = userRepo.findById(userId).orElse(null);
         BorrowableBook book = bookRepo.findById(bookId).orElse(null);
 
-        if (user == null || book == null)
-            return "User or book not found";
+        if (user == null || book == null) {
+            return "NOT_FOUND";
+        }
 
+        // 🔒 REGULA: user NU poate imprumuta aceeasi carte de 2 ori
         if (borrowedRepo.existsByUserIdAndBookIdAndReturnedFalse(userId, bookId)) {
             return "ALREADY_BORROWED";
-        }//adaugat recent
+        }
 
-        // REGULĂ NOUĂ: user NU poate împrumuta aceeași carte de 2 ori
-        boolean alreadyBorrowed =
-                borrowedRepo.existsByUserIdAndBookIdAndReturnedFalse(userId, bookId);
+        // 📦 verificam stocul
+        if (book.getQuantity() - book.getBorrowed() <= 0) {
+            return "NO_COPIES";
+        }
 
-        if (alreadyBorrowed)
-            return "You already borrowed this book";
-
-        // verificăm stocul
-        if (book.getQuantity() - book.getBorrowed() <= 0)
-            return "No copies available";
-
-        // actualizam stocul
+        // ➕ actualizam stocul
         book.setBorrowed(book.getBorrowed() + 1);
         bookRepo.save(book);
 
@@ -54,7 +49,7 @@ public class BorrowService {
                 user,
                 book,
                 LocalDate.now(),
-                LocalDate.now().plusDays(14) // 🔔 14 zile (cum ai cerut)
+                LocalDate.now().plusDays(14) // 14 zile
         );
 
         borrowedRepo.save(br);
@@ -62,23 +57,22 @@ public class BorrowService {
         return "SUCCESS";
     }
 
-
     // =====================================================
     // RETURNAREA UNEI CARTI
     // =====================================================
     public String returnBook(Long borrowId) {
 
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
-        if (br == null) return "Borrow record not found";
+        if (br == null) {
+            return "NOT_FOUND";
+        }
 
         br.setReturnDate(LocalDate.now());
 
         // calcul penalizare
         if (br.getReturnDate().isAfter(br.getDueDate())) {
-
             long daysLate =
                     ChronoUnit.DAYS.between(br.getDueDate(), br.getReturnDate());
-
             br.setLateFee(daysLate * 20.0); // 20 lei / zi
         } else {
             br.setLateFee(0.0);
@@ -101,7 +95,9 @@ public class BorrowService {
     public String resetLateFee(Long borrowId) {
 
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
-        if (br == null) return "Not found";
+        if (br == null) {
+            return "NOT_FOUND";
+        }
 
         br.setLateFee(0.0);
         borrowedRepo.save(br);
@@ -115,7 +111,9 @@ public class BorrowService {
     public String adminDeleteBorrow(Long borrowId) {
 
         BorrowedBook br = borrowedRepo.findById(borrowId).orElse(null);
-        if (br == null) return "Not found";
+        if (br == null) {
+            return "NOT_FOUND";
+        }
 
         if (!br.isReturned()) {
             BorrowableBook bk = br.getBook();
@@ -128,17 +126,8 @@ public class BorrowService {
     }
 
     // =====================================================
-    // METODA HELPER – RESTRICTIE 1 CARTE / USER
+    // JOB – RECALCULARE PENALIZARI
     // =====================================================
-    private boolean userAlreadyBorrowedThisBook(User user, BorrowableBook book) {
-
-        List<BorrowedBook> activeBorrows =
-                borrowedRepo.findByUserAndReturnedFalse(user);
-
-        return activeBorrows.stream()
-                .anyMatch(b -> b.getBook().getId().equals(book.getId()));
-    }
-
     public void runLateCheck() {
         borrowedRepo.findByReturnedFalse()
                 .forEach(borrow -> {
@@ -151,5 +140,4 @@ public class BorrowService {
                     }
                 });
     }
-
 }

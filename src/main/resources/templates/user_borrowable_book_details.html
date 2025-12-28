@@ -9,72 +9,139 @@
 
     <style>
         body {
-            background: #eef3f9;
+            min-height: 100vh;
+            background:
+                    linear-gradient(rgba(15,15,15,0.55), rgba(15,15,15,0.55)),
+                    url("https://images.unsplash.com/photo-1507842217343-583bb7270b66");
+            background-size: cover;
+            background-attachment: fixed;
             padding: 40px;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Segoe UI", system-ui, sans-serif;
         }
-        .card {
-            max-width: 650px;
+
+        .details-card {
+            max-width: 720px;
             margin: auto;
-            border-radius: 14px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-radius: 26px;
+            padding: 35px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.45);
         }
-        .label {
+
+        .book-title {
+            font-weight: 900;
+            color: #f59e0b;
+        }
+
+        .book-author {
+            color: #374151;
             font-weight: 600;
-            color: #0057d8;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .availability-badge {
+            background: linear-gradient(135deg, #fde68a, #f59e0b);
+            color: #1f2937;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-weight: 800;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        }
+
+        .back-btn {
+            background: #374151;
+            color: white;
+            border-radius: 999px;
+            padding: 8px 22px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #1f2937;
+            color: white;
         }
     </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="details-card">
 
-    <h3 class="text-center text-primary mb-2"
-        th:text="${book.title}">Title</h3>
+    <!-- TITLE -->
+    <h2 class="text-center book-title mb-2"
+        th:text="${book.title}">
+        Book Title
+    </h2>
 
-    <h5 class="text-center mb-4">
-        <span th:text="${book.author}">Author</span>
+    <h5 class="text-center book-author mb-4"
+        th:text="${book.author}">
+        Author
     </h5>
 
-    <div class="mb-2">
-        <span class="label">Category:</span>
-        <span th:text="${book.category}"></span>
+    <!-- DETAILS -->
+    <div class="info-row">
+        <span class="label">Category</span>
+        <span class="value" th:text="${book.category}"></span>
     </div>
 
-    <div class="mb-2">
-        <span class="label">Published year:</span>
-        <span th:text="${book.year}"></span>
+    <div class="info-row">
+        <span class="label">Published Year</span>
+        <span class="value" th:text="${book.year}"></span>
     </div>
 
-    <div class="mb-2">
-        <span class="label">ISBN:</span>
-        <span th:text="${book.isbn}"></span>
+    <div class="info-row">
+        <span class="label">ISBN</span>
+        <span class="value" th:text="${book.isbn}"></span>
     </div>
 
-    <div class="mb-2">
-        <span class="label">Edition:</span>
-        <span th:text="${book.edition}"></span>
+    <div class="info-row">
+        <span class="label">Edition</span>
+        <span class="value" th:text="${book.edition}"></span>
     </div>
 
-    <div class="mb-2">
-        <span class="label">Pages:</span>
-        <span th:text="${book.pages}"></span>
+    <div class="info-row">
+        <span class="label">Pages</span>
+        <span class="value" th:text="${book.pages}"></span>
     </div>
 
-    <div class="mb-2">
-        <span class="label">Publisher:</span>
-        <span th:text="${book.publisher}"></span>
+    <div class="info-row">
+        <span class="label">Publisher</span>
+        <span class="value" th:text="${book.publisher}"></span>
     </div>
 
-    <div class="mb-4">
-        <span class="label">Available:</span>
-        <span th:text="${book.quantity - book.borrowed}"></span>
+    <div class="info-row align-items-center mt-3">
+        <span class="label">Available</span>
+        <span class="availability-badge"
+              th:text="${book.quantity - book.borrowed}">
+        </span>
     </div>
 
-    <div class="d-flex justify-content-between">
-        <a href="/user/borrowable" class="btn btn-secondary">← Back</a>
+    <!-- ACTIONS -->
+    <div class="mt-4 d-flex justify-content-start">
+        <a href="/user/borrowable" class="back-btn">
+            ← Back
+        </a>
     </div>
 
 </div>

@@ -25,8 +25,18 @@ public class BorrowableBooksLoader {
             if (repo.count() > 0) return;
 
             ObjectMapper mapper = new ObjectMapper();
-            InputStream is = getClass().getClassLoader().getResourceAsStream("borrowable_books.json");
-            List<BorrowableBook> list = mapper.readValue(is, new TypeReference<List<BorrowableBook>>() {});
+            InputStream is = getClass().getClassLoader()
+                    .getResourceAsStream("borrowable_books.json");
+
+            List<BorrowableBook> list =
+                    mapper.readValue(is, new TypeReference<List<BorrowableBook>>() {});
+
+            // 🔧 FIX IMPORTANT: normalize borrowed field
+            list.forEach(b -> {
+                if (b.getBorrowed() == null) {
+                    b.setBorrowed(0);
+                }
+            });
 
             repo.saveAll(list);
             System.out.println("📘 Loaded borrowable_books.json successfully!");

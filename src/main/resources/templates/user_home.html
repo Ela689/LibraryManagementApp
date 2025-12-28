@@ -10,12 +10,13 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
+        /* ================= PAGE BACKGROUND ================= */
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: "Segoe UI", system-ui, sans-serif;
             background:
-                    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+                    linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.50)),
                     url("https://images.unsplash.com/photo-1507842217343-583bb7270b66");
             background-size: cover;
             background-position: center;
@@ -29,91 +30,140 @@
             padding: 40px;
         }
 
-        /* 🔥 GLASS EFFECT */
+        /* ================= GLASS DASHBOARD ================= */
         .dashboard-wrapper {
             width: 100%;
             max-width: 1200px;
-            padding: 35px 40px 45px;
-            border-radius: 28px;
-            background: rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+            padding: 40px 46px 50px;
+            border-radius: 32px;
+            background: rgba(255,255,255,0.20);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.45);
         }
 
+        /* ================= WELCOME ================= */
         .welcome-title {
             color: #ffffff;
-            font-weight: 700;
-            margin-bottom: 4px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(90deg, #60a5fa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .welcome-subtitle {
-            color: #e0e0e0;
-            font-size: 14px;
-            margin-bottom: 35px;
+            color: #e5e7eb;
+            font-size: 15px;
+            margin-bottom: 38px;
         }
 
-        /* 🟦 ONE ROW DASHBOARD */
+        /* ================= DASHBOARD GRID ================= */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 26px;
+            gap: 28px;
         }
 
+        /* ================= CARD BASE ================= */
         .card-box {
-            background: rgba(255,255,255,0.85);
-            border-radius: 20px;
-            padding: 28px 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 34px 24px;
             text-align: center;
             text-decoration: none;
-            box-shadow: 0 10px 26px rgba(0,0,0,0.2);
-            transition: all 0.25s ease;
-            border-left: 6px solid #0d6efd;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+            transition: transform .25s ease, box-shadow .25s ease;
+            border-left: 7px solid transparent;
+            position: relative;
         }
 
         .card-box:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 18px 36px rgba(0,0,0,0.35);
+            transform: translateY(-10px);
+            box-shadow: 0 26px 55px rgba(0,0,0,0.45);
             text-decoration: none;
         }
 
-        .card-box.borrow {
-            border-left-color: #f4b400;
-        }
-
-        .card-box.digital {
-            border-left-color: #0dcaf0;
-        }
-
-        .card-box.history {
-            border-left-color: #dc3545;
+        /* ================= ICON CIRCLE ================= */
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
         }
 
         .card-box i {
-            font-size: 42px;
-            margin-bottom: 12px;
-            color: inherit;
+            font-size: 34px;
         }
 
         .card-box h5 {
-            font-weight: 600;
+            font-weight: 700;
             margin: 0;
-            color: #212529;
+            color: #1f2937;
         }
 
+        /* ================= COLOR THEMES ================= */
+        .physical {
+            border-left-color: #2563eb;
+        }
+        .physical .icon-circle {
+            background: rgba(37,99,235,0.12);
+        }
+        .physical i { color: #2563eb; }
+
+        .borrow {
+            border-left-color: #f59e0b;
+        }
+        .borrow .icon-circle {
+            background: rgba(245,158,11,0.18);
+        }
+        .borrow i { color: #f59e0b; }
+
+        .digital {
+            border-left-color: #06b6d4;
+        }
+        .digital .icon-circle {
+            background: rgba(6,182,212,0.18);
+        }
+        .digital i { color: #06b6d4; }
+
+        .history {
+            border-left-color: #e11d48;
+        }
+        .history .icon-circle {
+            background: rgba(225,29,72,0.18);
+        }
+        .history i { color: #e11d48; }
+
+        /* ================= SEPARATOR ================= */
+        .separator {
+            height: 1px;
+            margin: 42px 0 30px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
+        }
+
+        /* ================= LOGOUT ================= */
         .logout-box {
             text-align: center;
-            margin-top: 45px;
         }
 
         .logout-box button {
-            padding: 10px 34px;
-            border-radius: 14px;
-            font-weight: 600;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+            padding: 12px 42px;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 12px 26px rgba(0,0,0,0.40);
         }
 
-        /* 📱 RESPONSIVE */
+        /* ================= RESPONSIVE ================= */
         @media (max-width: 1100px) {
             .dashboard {
                 grid-template-columns: repeat(2, 1fr);
@@ -134,6 +184,7 @@
 
     <div class="dashboard-wrapper">
 
+        <!-- ================= WELCOME ================= -->
         <h3 class="welcome-title">
             <i class="bi bi-person-circle"></i>
             Welcome, <span th:text="${user.username}">User</span>
@@ -143,30 +194,42 @@
             Explore, borrow and manage your books
         </div>
 
+        <!-- ================= DASHBOARD ================= -->
         <div class="dashboard">
 
-            <a href="/user/books/physical" class="card-box">
-                <i class="bi bi-book"></i>
+            <a href="/user/books/physical" class="card-box physical">
+                <div class="icon-circle">
+                    <i class="bi bi-book"></i>
+                </div>
                 <h5>Physical Books</h5>
             </a>
 
             <a href="/user/borrowable" class="card-box borrow">
-                <i class="bi bi-journal-bookmark"></i>
+                <div class="icon-circle">
+                    <i class="bi bi-journal-bookmark"></i>
+                </div>
                 <h5>Borrowable Books</h5>
             </a>
 
             <a href="/user/books/digital" class="card-box digital">
-                <i class="bi bi-tablet"></i>
+                <div class="icon-circle">
+                    <i class="bi bi-tablet"></i>
+                </div>
                 <h5>Digital Books</h5>
             </a>
 
             <a href="/user/borrowable/my-borrows" class="card-box history">
-                <i class="bi bi-clock-history"></i>
+                <div class="icon-circle">
+                    <i class="bi bi-clock-history"></i>
+                </div>
                 <h5>My Borrowed Books</h5>
             </a>
 
         </div>
 
+        <div class="separator"></div>
+
+        <!-- ================= LOGOUT ================= -->
         <div class="logout-box">
             <form action="/logout" method="post">
                 <button class="btn btn-danger">Logout</button>
