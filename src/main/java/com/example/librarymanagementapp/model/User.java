@@ -1,3 +1,4 @@
+//User.java
 package com.example.librarymanagementapp.model;
 
 import jakarta.persistence.*;
